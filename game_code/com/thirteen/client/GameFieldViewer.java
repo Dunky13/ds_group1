@@ -1,4 +1,4 @@
-package com.thirteen.shared.presentation;
+package com.thirteen.client;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -7,25 +7,24 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-
 import javax.swing.JPanel;
-
-import com.thirteen.shared.BattleField;
+import com.thirteen.shared.Const;
+import com.thirteen.shared.GameField;
 import com.thirteen.shared.GameState;
 import com.thirteen.shared.units.Dragon;
 import com.thirteen.shared.units.Player;
-import com.thirteen.shared.units.Unit;
-
+import com.thirteen.shared.units.base.Coordinate;
+import com.thirteen.shared.units.base.Unit;
 
 /**
- * Create an viewer, which runs in a seperate thread and
- * monitors the whole battlefield. Server side viewer,
- * this version cannot be run at client side.
+ * Create an viewer, which runs in a seperate thread and monitors the whole
+ * battlefield. Server side viewer, this version cannot be run at client side.
  * 
  * @author Pieter Anemaet, Boaz Pat-El
  */
 @SuppressWarnings("serial")
-public class BattleFieldViewer extends JPanel implements Runnable {
+public class GameFieldViewer extends JPanel implements Runnable
+{
 
 	/* Double buffered image */
 	private Image doubleBufferImage;
@@ -42,19 +41,20 @@ public class BattleFieldViewer extends JPanel implements Runnable {
 	private Thread runnerThread;
 
 	/**
-	 * Create a battlefield viewer in 
-	 * a new thread. 
+	 * Create a battlefield viewer in a new thread.
 	 */
-	public BattleFieldViewer() {
+	public GameFieldViewer()
+	{
 		doubleBufferGraphics = null;
 		runnerThread = new Thread(this);
 		runnerThread.start();
 	}
 
 	/**
-	 * Initialize the double buffer. 
+	 * Initialize the double buffer.
 	 */
-	private void initDB() {
+	private void initDB()
+	{
 		bufferWidth = getWidth();
 		bufferHeight = getHeight();
 		doubleBufferImage = createImage(getWidth(), getHeight());
@@ -62,22 +62,23 @@ public class BattleFieldViewer extends JPanel implements Runnable {
 	}
 
 	/**
-	 * Paint the battlefield overview. Use a red color
-	 * for dragons and a blue one for players. 
+	 * Paint the battlefield overview. Use a red color for dragons and a blue
+	 * one for players.
 	 */
-	public void paint(Graphics g) {
+	public void paint(Graphics g)
+	{
 		Unit u;
 		double x = 0, y = 0;
-		double xRatio = (double)this.getWidth() / (double)BattleField.MAP_WIDTH;
-		double yRatio = (double)this.getHeight() / (double)BattleField.MAP_HEIGHT;
+		double xRatio = (double)this.getWidth() / (double)Const.MAP_WIDTH;
+		double yRatio = (double)this.getHeight() / (double)Const.MAP_HEIGHT;
 		double filler;
-		BattleField bf = BattleField.getBattleField();
+		GameField bf = GameField.getBattleField();
 
 		/* Possibly adjust the double buffer */
-		if(bufferWidth != getSize().width 
-				|| bufferHeight != getSize().height 
-				|| doubleBufferImage == null 
-				|| doubleBufferGraphics == null)
+		if (bufferWidth != getSize().width
+			|| bufferHeight != getSize().height
+			|| doubleBufferImage == null
+			|| doubleBufferGraphics == null)
 			initDB();
 
 		/* Fill the background */
@@ -86,10 +87,12 @@ public class BattleFieldViewer extends JPanel implements Runnable {
 		doubleBufferGraphics.setColor(Color.BLACK);
 
 		/* Draw the field, rectangle-wise */
-		for(int i = 0; i < BattleField.MAP_WIDTH; i++, x += xRatio, y = 0)
-			for(int j = 0; j < BattleField.MAP_HEIGHT; j++, y += yRatio) {
-				u = bf.getUnit(i, j);
-				if (u == null) continue; // Nothing to draw in this sector
+		for (int i = 0; i < Const.MAP_WIDTH; i++, x += xRatio, y = 0)
+			for (int j = 0; j < Const.MAP_HEIGHT; j++, y += yRatio)
+			{
+				u = bf.getUnit(new Coordinate(i, j));
+				if (u == null)
+					continue; // Nothing to draw in this sector
 
 				if (u instanceof Dragon)
 					doubleBufferGraphics.setColor(Color.RED);
@@ -102,7 +105,8 @@ public class BattleFieldViewer extends JPanel implements Runnable {
 				/* Draw healthbar */
 				doubleBufferGraphics.setColor(Color.GREEN);
 				filler = (double)yRatio * u.getHitPoints() / (double)u.getMaxHitPoints();
-				doubleBufferGraphics.fillRect((int)(x + 0.75 * xRatio), (int)(y + 1 + yRatio - filler), (int)xRatio / 4, (int)(filler));
+				doubleBufferGraphics
+					.fillRect((int)(x + 0.75 * xRatio), (int)(y + 1 + yRatio - filler), (int)xRatio / 4, (int)(filler));
 
 				/* Draw the identifier */
 				doubleBufferGraphics.setColor(Color.WHITE);
@@ -117,16 +121,37 @@ public class BattleFieldViewer extends JPanel implements Runnable {
 		g.drawImage(doubleBufferImage, 0, 0, this);
 	}
 
-	public void run() {
+	public void run()
+	{
 		final Frame f = new Frame();
-		f.addWindowListener(new WindowListener() {
-			public void windowDeactivated(WindowEvent e) {}
-			public void windowDeiconified(WindowEvent e) {}
-			public void windowIconified(WindowEvent e) {}
-			public void windowOpened(WindowEvent e) {}
-			public void windowActivated(WindowEvent e) {}
-			public void windowClosed(WindowEvent e) {}
-			public void windowClosing(WindowEvent e) {
+		f.addWindowListener(new WindowListener()
+		{
+			public void windowDeactivated(WindowEvent e)
+			{
+			}
+
+			public void windowDeiconified(WindowEvent e)
+			{
+			}
+
+			public void windowIconified(WindowEvent e)
+			{
+			}
+
+			public void windowOpened(WindowEvent e)
+			{
+			}
+
+			public void windowActivated(WindowEvent e)
+			{
+			}
+
+			public void windowClosed(WindowEvent e)
+			{
+			}
+
+			public void windowClosing(WindowEvent e)
+			{
 				// What happens if the user closes this window?
 				f.setVisible(false); // The window becomes invisible
 				GameState.haltProgram(); // And the game stops running
@@ -137,29 +162,37 @@ public class BattleFieldViewer extends JPanel implements Runnable {
 		f.setMinimumSize(new Dimension(200, 200));
 		f.setSize(1000, 1000);
 		f.setVisible(true);
-		
-		while(GameState.getRunningState()) {		
+
+		while (GameState.getRunningState())
+		{
 			/* Keep the system running on a nice speed */
-			try {
+			try
+			{
 				Thread.sleep((int)(1000 * GameState.GAME_SPEED));
 				invalidate();
 				repaint();
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e)
+			{
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	/**
-	 * Stop the running thread. This has to be called explicitly to make sure the program 
-	 * terminates cleanly.
+	 * Stop the running thread. This has to be called explicitly to make sure
+	 * the program terminates cleanly.
 	 */
-	public void stopRunnerThread() {
-		try {
+	public void stopRunnerThread()
+	{
+		try
+		{
 			runnerThread.join();
-		} catch (InterruptedException ex) {
-			assert(false) : "BattleFieldViewer stopRunnerThread was interrupted";
 		}
-		
+		catch (InterruptedException ex)
+		{
+			assert (false) : "BattleFieldViewer stopRunnerThread was interrupted";
+		}
+
 	}
 }

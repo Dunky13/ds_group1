@@ -1,6 +1,6 @@
-/Dragon.class
-/Player.class
+/Coordinate.class
 /Unit$Direction.class
 /Unit$UnitType.class
 /Unit.class
-/Coordinate.class
+/UnitType.class
+/Direction.class

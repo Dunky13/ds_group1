@@ -1,9 +1,9 @@
 package com.thirteen.shared;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import com.thirteen.shared.units.base.Unit;
 import java.io.Serializable;
-
-import com.thirteen.shared.units.Unit;
 
 
 public class Message implements Serializable {
