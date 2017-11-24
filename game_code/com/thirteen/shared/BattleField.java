@@ -284,6 +284,7 @@ public class BattleField implements IMessageReceivedHandler {
 		}
 		catch(IDNotAssignedException idnae)  {
 			// Could happen if the target already logged out
+			
 		}
 	}
 

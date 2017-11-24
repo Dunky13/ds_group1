@@ -13,6 +13,8 @@ import com.thirteen.shared.units.Player;
  * @author Pieter Anemaet, Boaz Pat-El
  */
 public class Core {
+	public static final int NUMBER_OF_SERVERS = 5;
+	
 	public static final int MIN_PLAYER_COUNT = 30;
 	public static final int MAX_PLAYER_COUNT = 60;
 	public static final int DRAGON_COUNT = 20;

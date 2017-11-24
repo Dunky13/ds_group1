@@ -7,7 +7,9 @@ import com.thirteen.shared.core.exception.IDNotAssignedException;
 import com.thirteen.shared.units.Unit;
 
 public class Socket {
-
+	//Should we code this as the base sockect class and then derive multicast and publish-subscribe from it?
+	
+	
 	public void register(String string) throws AlreadyAssignedIDException{
 		// TODO Auto-generated method stub
 		
