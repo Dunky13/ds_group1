@@ -4,18 +4,18 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.thirteen.shared.BattleField;
 import com.thirteen.shared.GameState;
+import com.thirteen.shared.Message;
 
-im
-import com.thirteen.shared.*;port ort com.thirteen.sharedtleField;
-import distributed.systems.das.MessageRequest;
-import distributed.systems.core.IMessageReceivedHandler;
-import distributed.systems.core.Message;
-import distributed.systems.core.Socket;
-import distributed.systems.core.SynchronizedSocket;
-import distributed.systems.core.exception.AlreadyAssignedIDException;
-import distributed.systems.core.exception.IDNotAssignedException;
-import distributed.systems.example.LocalSocket;
+import com.thirteen.shared.core.IMessageReceivedHandler;
+import com.thirteen.shared.core.exception.AlreadyAssignedIDException;
+import com.thirteen.shared.core.exception.IDNotAssignedException;
+import com.thirteen.shared.core.Socket;
+import com.thirteen.shared.core.LocalSocket;
+import com.thirteen.shared.core.SynchronizedSocket;
+
+import com.thirteen.shared.MessageRequest;
 
 /**
  * Base class for all players whom can 
@@ -140,7 +140,12 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler {
 		}
 		
 		// Send a spawn message
-		clientSocket.sendMessage(damageMessage, "localsocket://" + BattleField.serverID);
+		try {
+			clientSocket.sendMessage(damageMessage, "localsocket://" + BattleField.serverID);
+		} catch (IDNotAssignedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void healDamage(int x, int y, int healed) {
@@ -161,7 +166,12 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler {
 		}
 
 		// Send a spawn message
-		clientSocket.sendMessage(healMessage, "localsocket://" + BattleField.serverID);
+		try {
+			clientSocket.sendMessage(healMessage, "localsocket://" + BattleField.serverID);
+		} catch (IDNotAssignedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -264,7 +274,12 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler {
 		getMessage.put("id", id);
 
 		// Send the getUnit message
-		clientSocket.sendMessage(getMessage, "localsocket://" + BattleField.serverID);
+		try {
+			clientSocket.sendMessage(getMessage, "localsocket://" + BattleField.serverID);
+		} catch (IDNotAssignedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		// Wait for the reply
 		while(!messageList.containsKey(id)) {
@@ -297,7 +312,12 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler {
 		getMessage.put("id", id);
 
 		// Send the getUnit message
-		clientSocket.sendMessage(getMessage, "localsocket://" + BattleField.serverID);
+		try {
+			clientSocket.sendMessage(getMessage, "localsocket://" + BattleField.serverID);
+		} catch (IDNotAssignedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		// Wait for the reply
 		while(!messageList.containsKey(id)) {
@@ -327,7 +347,12 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler {
 		removeMessage.put("id", id);
 
 		// Send the removeUnit message
-		clientSocket.sendMessage(removeMessage, "localsocket://" + BattleField.serverID);
+		try {
+			clientSocket.sendMessage(removeMessage, "localsocket://" + BattleField.serverID);
+		} catch (IDNotAssignedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	protected void moveUnit(int x, int y)
@@ -341,7 +366,12 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler {
 		moveMessage.put("unit", this);
 
 		// Send the getUnit message
-		clientSocket.sendMessage(moveMessage, "localsocket://" + BattleField.serverID);
+		try {
+			clientSocket.sendMessage(moveMessage, "localsocket://" + BattleField.serverID);
+		} catch (IDNotAssignedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		// Wait for the reply
 		while(!messageList.containsKey(id))

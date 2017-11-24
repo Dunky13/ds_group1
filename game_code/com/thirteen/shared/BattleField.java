@@ -6,11 +6,13 @@ import com.thirteen.shared.units.Dragon;
 import com.thirteen.shared.units.Player;
 import com.thirteen.shared.units.Unit;
 import com.thirteen.shared.units.Unit.UnitType;
-//import distributed.systems.core.IMessageReceivedHandler;
-//import distributed.systems.core.Message;
-//import distributed.systems.core.Socket;
-//import distributed.systems.core.SynchronizedSocket;
-//import distributed.systems.core.exception.IDNotAssignedException;
+import com.thirteen.shared.core.IMessageReceivedHandler;
+import com.thirteen.shared.core.LocalSocket;
+import com.thirteen.shared.Message;
+import com.thirteen.shared.core.Socket;
+import com.thirteen.shared.core.SynchronizedSocket;
+import com.thirteen.shared.core.exception.AlreadyAssignedIDException;
+import com.thirteen.shared.core.exception.IDNotAssignedException;
 //import distributed.systems.example.LocalSocket;
 
 /**
@@ -53,7 +55,12 @@ public class BattleField implements IMessageReceivedHandler {
 		
 		synchronized (this) {
 			map = new Unit[width][height];
-			local.register(BattleField.serverID);
+			try {
+				local.register(BattleField.serverID);
+			} catch (AlreadyAssignedIDException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			serverSocket = new SynchronizedSocket(local);
 			serverSocket.addMessageReceivedHandler(this);
 			units = new ArrayList<Unit>();
