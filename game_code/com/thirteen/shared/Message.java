@@ -38,5 +38,8 @@ public class Message implements Serializable {
 		return contents.toString();
 	}
 	
+	public Iterator getIterator() {
+		return contents.entrySet().iterator();
+	}
 	
 }
