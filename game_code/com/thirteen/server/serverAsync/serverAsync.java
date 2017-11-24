@@ -56,7 +56,7 @@ class ConnectionHandler implements
     e.printStackTrace();
   }
 }
-
+// Class that handles the messages with the client
 class ReadWriteHandler implements CompletionHandler<Integer, Attachment> {
   @Override
   public void completed(Integer result, Attachment attach) {
@@ -70,8 +70,8 @@ class ReadWriteHandler implements CompletionHandler<Integer, Attachment> {
       }
       return;
     }
-
     if (attach.isRead) {
+      // decoding the client message
       attach.buffer.flip();
       int limits = attach.buffer.limit();
       byte bytes[] = new byte[limits];
@@ -81,10 +81,8 @@ class ReadWriteHandler implements CompletionHandler<Integer, Attachment> {
       System.out.format("Client at  %s  says: %s%n", attach.clientAddr,
           msg);
       attach.isRead = false; // It is a write
-      attach.buffer.rewind();
-
-    } else {
-      // Write to the client
+      attach.buffer.rewind();      
+      // Mirror: send back the received message to client
       attach.client.write(attach.buffer, attach, this);
       attach.isRead = true;
       attach.buffer.clear();

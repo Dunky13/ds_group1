@@ -38,6 +38,7 @@ class Attachment {
   Thread mainThread;
   boolean isRead;
 }
+// class that handles the messages with the server
 class ReadWriteHandler implements CompletionHandler<Integer, Attachment> {
   @Override
   public void completed(Integer result, Attachment attach) {
