@@ -8,7 +8,8 @@ import java.nio.channels.CompletionHandler;
 import java.nio.charset.Charset;
 import java.util.concurrent.Future;
 
-public class clientAsync {
+public class ClientAsync {
+  
   public static void main(String[] args) throws Exception {
     AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
     SocketAddress serverAddr = new InetSocketAddress("localhost", 8989);
@@ -27,22 +28,18 @@ public class clientAsync {
     attach.buffer.put(data);
     attach.buffer.flip();
 
-    ReadWriteHandler readWriteHandler = new ReadWriteHandler();
+    ReadWriteHandlerClient readWriteHandler = new ReadWriteHandlerClient();
     channel.write(attach.buffer, attach, readWriteHandler);
     attach.mainThread.join();
   }
 }
-class Attachment {
-  AsynchronousSocketChannel channel;
-  ByteBuffer buffer;
-  Thread mainThread;
-  boolean isRead;
-}
+
 // class that handles the messages with the server
-class ReadWriteHandler implements CompletionHandler<Integer, Attachment> {
+class ReadWriteHandlerClient implements CompletionHandler<Integer, Attachment> {
   @Override
   public void completed(Integer result, Attachment attach) {
     if (attach.isRead) {
+      // decode server answer. Useful to receive ACK
       attach.buffer.flip();
       Charset cs = Charset.forName("UTF-8");
       int limits = attach.buffer.limit();
@@ -51,6 +48,7 @@ class ReadWriteHandler implements CompletionHandler<Integer, Attachment> {
       String msg = new String(bytes, cs);
       System.out.format("Server Responded: "+ msg);
       try {
+        // ask the user for another message to send to server
         msg = this.getTextFromUser();
       } catch (Exception e) {
         e.printStackTrace();
@@ -65,7 +63,7 @@ class ReadWriteHandler implements CompletionHandler<Integer, Attachment> {
       attach.buffer.flip();
       attach.isRead = false; // It is a write
       attach.channel.write(attach.buffer, attach, this);
-    }else {
+    } else {
       attach.isRead = true;
       attach.buffer.clear();
       attach.channel.read(attach.buffer, attach, this);

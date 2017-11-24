@@ -7,7 +7,8 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.Charset;
 
-public class serverAsync {
+public class ServerAsync {
+  
   public static void main(String[] args) throws Exception {
     AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
     String host = "localhost";
@@ -21,13 +22,6 @@ public class serverAsync {
     Thread.currentThread().join();
   }
 }
-class Attachment {
-  AsynchronousServerSocketChannel server;
-  AsynchronousSocketChannel client;
-  ByteBuffer buffer;
-  SocketAddress clientAddr;
-  boolean isRead;
-}
 
 class ConnectionHandler implements
     CompletionHandler<AsynchronousSocketChannel, Attachment> {
@@ -37,10 +31,10 @@ class ConnectionHandler implements
       SocketAddress clientAddr = client.getRemoteAddress();
       System.out.format("Accepted a  connection from  %s%n", clientAddr);
       attach.server.accept(attach, this);
-      ReadWriteHandler rwHandler = new ReadWriteHandler();
+      ReadWriteHandlerServer rwHandler = new ReadWriteHandlerServer();
       Attachment newAttach = new Attachment();
       newAttach.server = attach.server;
-      newAttach.client = client;
+      newAttach.channel = client;
       newAttach.buffer = ByteBuffer.allocate(2048);
       newAttach.isRead = true;
       newAttach.clientAddr = clientAddr;
@@ -57,12 +51,12 @@ class ConnectionHandler implements
   }
 }
 // Class that handles the messages with the client
-class ReadWriteHandler implements CompletionHandler<Integer, Attachment> {
+class ReadWriteHandlerServer implements CompletionHandler<Integer, Attachment> {
   @Override
   public void completed(Integer result, Attachment attach) {
     if (result == -1) {
       try {
-        attach.client.close();
+        attach.channel.close();
         System.out.format("Stopped   listening to the   client %s%n",
             attach.clientAddr);
       } catch (IOException ex) {
@@ -80,13 +74,13 @@ class ReadWriteHandler implements CompletionHandler<Integer, Attachment> {
       String msg = new String(bytes, cs);
       System.out.format("Client at  %s  says: %s%n", attach.clientAddr,
           msg);
-      attach.isRead = false; // It is a write
+      attach.isRead = false; // to rm
       attach.buffer.rewind();      
       // Mirror: send back the received message to client
-      attach.client.write(attach.buffer, attach, this);
+      attach.channel.write(attach.buffer, attach, this);
       attach.isRead = true;
       attach.buffer.clear();
-      attach.client.read(attach.buffer, attach, this);
+      attach.channel.read(attach.buffer, attach, this);
     }
   }
 
