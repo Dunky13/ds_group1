@@ -24,6 +24,7 @@ public class Player extends Unit implements Runnable, Serializable {
 	 * Measured in half a seconds x GAME_SPEED.
 	 */
 	protected int timeBetweenTurns;
+	private BattleField battlefield;
 	public static final int MIN_TIME_BETWEEN_TURNS = 2;
 	public static final int MAX_TIME_BETWEEN_TURNS = 7;
 	public static final int MIN_HITPOINTS = 20;
@@ -35,10 +36,13 @@ public class Player extends Unit implements Runnable, Serializable {
 	 * Create a player, initialize both 
 	 * the hit and the attackpoints. 
 	 */
-	public Player(int x, int y) {
+	public Player(BattleField b) {
 		/* Initialize the hitpoints and attackpoints */
 		super((int)(Math.random() * (MAX_HITPOINTS - MIN_HITPOINTS) + MIN_HITPOINTS), (int)(Math.random() * (MAX_ATTACKPOINTS - MIN_ATTACKPOINTS) + MIN_ATTACKPOINTS));
-
+		this.setBattlefield(b);
+		if(!this.findPosition()) {
+			return;
+		}
 		/* Create a random delay */
 		timeBetweenTurns = (int)(Math.random() * (MAX_TIME_BETWEEN_TURNS - MIN_TIME_BETWEEN_TURNS)) + MIN_TIME_BETWEEN_TURNS;
 
@@ -49,6 +53,7 @@ public class Player extends Unit implements Runnable, Serializable {
 		//new Thread(this).start();
 		runnerThread = new Thread(this);
 		runnerThread.start();
+		this.running = true;
 	}
 
 	/**
@@ -139,6 +144,45 @@ public class Player extends Unit implements Runnable, Serializable {
 			}
 		}
 		clientSocket.unRegister();
+	}
+	
+	private boolean findPosition() {
+		int x, y, attempt = 0;
+		do {
+			x = (int)(Math.random() * BattleField.MAP_WIDTH);
+			y = (int)(Math.random() * BattleField.MAP_HEIGHT);
+			attempt++;
+		} while (battlefield.getUnit(x, y) != null && attempt < 10);
+
+		// If we didn't find an empty spot, we won't add a new player
+		if (attempt >= 10) return false;
+
+		this.x = x;
+		this.y = y;
+
+		/* Create the new player in a separate
+		 * thread, making sure it does not 
+		 * block the system.
+		 */
+		return true;
+	}
+
+	/**
+	 * @return the battlefield
+	 */
+	public BattleField getBattlefield() {
+		return battlefield;
+	}
+
+	/**
+	 * @param battlefield the battlefield to set
+	 */
+	public void setBattlefield(BattleField battlefield) {
+		this.battlefield = battlefield;
+	}
+
+	public boolean running() {
+		return this.running;
 	}
 
 }

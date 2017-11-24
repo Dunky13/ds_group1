@@ -122,7 +122,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler {
 			removeUnit(x, y);
 	}
 	
-	public void dealDamage(int x, int y, int damage) {
+	public Message dealDamage(int x, int y, int damage) {
 		/* Create a new message, notifying the board
 		 * that a unit has been dealt damage.
 		 */
@@ -138,17 +138,10 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler {
 			damageMessage.put("damage", damage);
 			damageMessage.put("id", id);
 		}
-		
-		// Send a spawn message
-		try {
-			clientSocket.sendMessage(damageMessage, "localsocket://" + BattleField.serverID);
-		} catch (IDNotAssignedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return damageMessage;
 	}
 	
-	public void healDamage(int x, int y, int healed) {
+	public Message healDamage(int x, int y, int healed) {
 		/* Create a new message, notifying the board
 		 * that a unit has been healed.
 		 */
@@ -165,13 +158,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler {
 			healMessage.put("id", id);
 		}
 
-		// Send a spawn message
-		try {
-			clientSocket.sendMessage(healMessage, "localsocket://" + BattleField.serverID);
-		} catch (IDNotAssignedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return healMessage;
 	}
 
 	/**
