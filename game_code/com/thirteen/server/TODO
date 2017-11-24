@@ -1,0 +1,7 @@
+TODO LIST:
+
+- rename Attachment class both server/client
+
+- generate dynamically server port for listening binding
+
+- create bufferof known whenever we receive a connection from an unknown host
