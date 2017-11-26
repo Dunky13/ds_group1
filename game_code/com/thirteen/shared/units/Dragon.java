@@ -51,7 +51,7 @@ public class Dragon extends Unit implements Runnable, Serializable
 
 		this.unitType = UnitType.dragon;
 		this.client = client;
-		this.setBattlefield(client.getBattleField());
+		this.setBattlefield(client.retrieveBattleField());
 
 		this.c = this.battlefield.findPosition();
 		Message spawn = spawn(c);

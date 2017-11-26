@@ -50,7 +50,7 @@ public class Player extends Unit implements Runnable, Serializable
 			(int)(Math.random() * (MAX_ATTACKPOINTS - MIN_ATTACKPOINTS) + MIN_ATTACKPOINTS));
 		this.unitType = UnitType.player;
 		this.client = client;
-		this.setBattlefield(client.getBattleField());
+		this.setBattlefield(client.retrieveBattleField());
 
 		this.c = this.battlefield.findPosition();
 		Message spawn = spawn(c);
@@ -127,7 +127,6 @@ public class Player extends Unit implements Runnable, Serializable
 				this.dragonToAttack = null;
 			}
 		}
-
 	}
 
 	/**

@@ -209,6 +209,11 @@ public class GameField implements Serializable
 		if (u != null)
 		{
 			u.adjustHitPoints(Math.abs(heal));
+			if (u.isDead())
+			{
+				u.disconnect();
+				u.stopRunnerThread();
+			}
 		}
 	}
 
@@ -228,5 +233,19 @@ public class GameField implements Serializable
 			return null;
 
 		return c;
+	}
+
+	/**
+	 * Close down the battlefield. Unregisters the serverSocket so the program
+	 * can actually end.
+	 */
+	public synchronized void shutdown()
+	{
+		// Remove all units from the battlefield and make them disconnect from the server
+		for (Unit unit : units)
+		{
+			unit.disconnect();
+			unit.stopRunnerThread();
+		}
 	}
 }

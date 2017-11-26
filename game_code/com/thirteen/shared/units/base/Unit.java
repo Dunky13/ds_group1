@@ -307,4 +307,9 @@ public abstract class Unit implements Serializable
 	{
 		return this.unitType;
 	}
+
+	public boolean isDead()
+	{
+		return this.getHitPoints() <= 0;
+	}
 }
