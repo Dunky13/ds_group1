@@ -18,6 +18,7 @@ public abstract class Unit implements Serializable
 	private static final long serialVersionUID = -4550572524008491160L;
 
 	// Position of the unit
+	protected UnitType unitType;
 	protected Coordinate c;
 	protected Client client;
 	protected GameField battlefield;
@@ -62,6 +63,8 @@ public abstract class Unit implements Serializable
 
 		// Get a new unit id
 		unitID = GameField.getBattleField().getNewUnitID();
+
+		this.unitType = UnitType.undefined;
 	}
 
 	/**
@@ -226,21 +229,6 @@ public abstract class Unit implements Serializable
 		}
 	}
 
-	/**
-	 * Returns whether the indicated square contains a player, a dragon or
-	 * nothing.
-	 * 
-	 * @param c:
-	 *            x, y coordinate
-	 * @return UnitType: the indicated square contains a player, a dragon or
-	 *         nothing.
-	 */
-	protected UnitType getType(Coordinate c)
-	{
-		return this.battlefield.getType(c);
-
-	}
-
 	protected Unit getUnit(Coordinate c)
 	{
 		return this.battlefield.getUnit(c);
@@ -313,5 +301,10 @@ public abstract class Unit implements Serializable
 	public boolean running()
 	{
 		return this.running;
+	}
+
+	public UnitType getUnitType()
+	{
+		return this.unitType;
 	}
 }

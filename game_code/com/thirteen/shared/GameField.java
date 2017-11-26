@@ -2,11 +2,8 @@ package com.thirteen.shared;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import com.thirteen.shared.units.Dragon;
-import com.thirteen.shared.units.Player;
 import com.thirteen.shared.units.base.Coordinate;
 import com.thirteen.shared.units.base.Unit;
-import com.thirteen.shared.units.base.UnitType;
 
 public class GameField implements Serializable
 {
@@ -197,35 +194,22 @@ public class GameField implements Serializable
 		return ++lastUnitID;
 	}
 
-	public synchronized UnitType getType(Coordinate c)
-	{
-		Unit u = this.getUnit(c);
-		if (u instanceof Player)
-		{
-			return UnitType.player;
-		}
-		else if (u instanceof Dragon)
-		{
-			return UnitType.dragon;
-		}
-		else
-		{
-			return UnitType.undefined;
-		}
-	}
-
 	public synchronized void dealDamage(Coordinate c, int damage)
 	{
 		Unit u = this.getUnit(c);
 		if (u != null)
 		{
-			u.adjustHitPoints(damage);
+			u.adjustHitPoints(-Math.abs(damage));
 		}
 	}
 
 	public synchronized void healDamage(Coordinate c, int heal)
 	{
-		this.dealDamage(c, heal);
+		Unit u = this.getUnit(c);
+		if (u != null)
+		{
+			u.adjustHitPoints(Math.abs(heal));
+		}
 	}
 
 	public Coordinate findPosition()

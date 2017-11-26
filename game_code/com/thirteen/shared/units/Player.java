@@ -28,12 +28,16 @@ public class Player extends Unit implements Runnable, Serializable
 	 * Measured in half a seconds x GAME_SPEED.
 	 */
 	protected int timeBetweenTurns;
+	private Coordinate dragonToAttack;
 	public static final int MIN_TIME_BETWEEN_TURNS = 2;
 	public static final int MAX_TIME_BETWEEN_TURNS = 7;
 	public static final int MIN_HITPOINTS = 20;
 	public static final int MAX_HITPOINTS = 10;
 	public static final int MIN_ATTACKPOINTS = 1;
 	public static final int MAX_ATTACKPOINTS = 10;
+
+	public static final int MAX_HEAL_RANGE = 5;
+	public static final int MAX_ATTACT_RANGE = 2;
 
 	/**
 	 * Create a player, initialize both the hit and the attackpoints.
@@ -44,6 +48,7 @@ public class Player extends Unit implements Runnable, Serializable
 		super(
 			(int)(Math.random() * (MAX_HITPOINTS - MIN_HITPOINTS) + MIN_HITPOINTS),
 			(int)(Math.random() * (MAX_ATTACKPOINTS - MIN_ATTACKPOINTS) + MIN_ATTACKPOINTS));
+		this.unitType = UnitType.player;
 		this.client = client;
 		this.setBattlefield(client.getBattleField());
 
@@ -57,6 +62,7 @@ public class Player extends Unit implements Runnable, Serializable
 		{
 			this.client.sendMessage(spawn);
 		}
+		this.dragonToAttack = null;
 		/* Create a random delay */
 		timeBetweenTurns = (int)(Math.random() * (MAX_TIME_BETWEEN_TURNS - MIN_TIME_BETWEEN_TURNS)) + MIN_TIME_BETWEEN_TURNS;
 		/* Create a new player thread */
@@ -78,15 +84,11 @@ public class Player extends Unit implements Runnable, Serializable
 	public void run()
 	{
 		Direction direction;
-		UnitType adjacentUnitType;
 
 		this.running = true;
 
 		while (GameState.getRunningState() && this.running)
 		{
-
-			//TODO: Create AI here
-
 			try
 			{
 				/* Sleep while the player is considering its next move */
@@ -96,41 +98,95 @@ public class Player extends Unit implements Runnable, Serializable
 				if (getHitPoints() <= 0)
 					break;
 
-				// Randomly choose one of the four wind directions to move to if there are no units present
-				direction = Direction.values()[(int)(Direction.values().length * Math.random())];
-				adjacentUnitType = UnitType.undefined;
-
-				Coordinate target = this.makeMove(direction);
-				if (target == null)
+				Coordinate closestHealTarget = this.findClosestHeal(1);
+				if (closestHealTarget != null)
 				{
-					continue;
+					this.client.sendMessage(this.healDamage(closestHealTarget, getAttackPoints()));
 				}
-
-				// Get what unit lies in the target square
-				adjacentUnitType = this.getType(target);
-
-				switch (adjacentUnitType)
+				else if (this.dragonToAttack != null)
 				{
-				case undefined:
-					// There is no unit in the square. Move the player to this square
+					this.client.sendMessage(this.dealDamage(this.dragonToAttack, getAttackPoints()));
+				}
+				else
+				{
+					direction = Direction.values()[(int)(Direction.values().length * Math.random())];
+					Coordinate target = this.makeMove(direction);
+					if (target == null)
+					{
+						continue;
+					}
 					this.client.sendMessage(this.moveUnit(target));
-					break;
-				case player:
-					// There is a player in the square, attempt a healing
-					this.client.sendMessage(this.healDamage(target, getAttackPoints()));
-					break;
-				case dragon:
-					// There is a dragon in the square, attempt a dragon slaying
-					this.client.sendMessage(this.dealDamage(target, getAttackPoints()));
-					break;
 				}
 			}
 			catch (InterruptedException e)
 			{
 				e.printStackTrace();
 			}
+			finally
+			{
+				this.dragonToAttack = null;
+			}
 		}
 
+	}
+
+	/**
+	 * Find closest coordinate for player healing. This happens recursively.
+	 * 
+	 * @param distance
+	 * @return Coordinate if other player needs healing. null if no player is in
+	 *         range.
+	 */
+	private Coordinate findClosestHeal(int distance)
+	{
+		if (distance > Player.MAX_HEAL_RANGE)
+		{
+			return null;
+		}
+		for (int i = -distance; i <= distance; i++)
+		{
+			for (int j = -distance; j <= distance; j++)
+			{
+				//This player - skip
+				if (i == 0 && j == 0)
+					continue;
+				//Not in search distance.
+				if (Math.abs(i) + Math.abs(j) > distance)
+					continue;
+
+				//Coordinate of new distance
+				Coordinate c = new Coordinate(this.getX() + i, this.getY() + j);
+				//If Coordinate is not within the gamefield;
+				if (!c.inBound(0, Const.MAP_WIDTH, 0, Const.MAP_HEIGHT))
+					continue;
+
+				Unit u = this.battlefield.getUnit(c);
+				if (u == null)
+					continue;
+
+				UnitType ut = u.getUnitType();
+				// Attack can happen only in attack range and only in one direction
+				if (distance <= Player.MAX_ATTACT_RANGE && (i == 0 || j == 0))
+				{
+					if (ut == UnitType.undefined)
+						continue; //if in attack range, check for player & dragon
+					if (ut == UnitType.dragon)
+					{
+						this.dragonToAttack = c;
+						continue;
+					}
+				}
+				else if (ut != UnitType.player)
+					continue; //if not in range, check for player
+
+				Player other = (Player)u;
+
+				// If hitpoints below 50%
+				if (other.getHitPoints() < other.getMaxHitPoints() / 2.0)
+					return c;
+			}
+		}
+		return this.findClosestHeal(distance + 1);
 	}
 
 	private Coordinate makeMove(Direction direction)

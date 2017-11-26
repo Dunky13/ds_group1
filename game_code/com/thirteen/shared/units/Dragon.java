@@ -49,6 +49,7 @@ public class Dragon extends Unit implements Runnable, Serializable
 			(int)(Math.random() * (MAX_HITPOINTS - MIN_HITPOINTS) + MIN_HITPOINTS),
 			(int)(Math.random() * (MAX_ATTACKPOINTS - MIN_ATTACKPOINTS) + MIN_ATTACKPOINTS));
 
+		this.unitType = UnitType.dragon;
 		this.client = client;
 		this.setBattlefield(client.getBattleField());
 
@@ -102,16 +103,16 @@ public class Dragon extends Unit implements Runnable, Serializable
 				Coordinate left = new Coordinate(c, -1, 0);
 				Coordinate right = new Coordinate(c, 1, 0);
 				if (getY() > 0)
-					if (getType(up) == UnitType.player)
+					if (getUnit(up).getUnitType() == UnitType.player)
 						adjacentPlayers.add(Direction.up);
 				if (getY() < Const.MAP_WIDTH - 1)
-					if (getType(down) == UnitType.player)
+					if (getUnit(down).getUnitType() == UnitType.player)
 						adjacentPlayers.add(Direction.down);
 				if (getX() > 0)
-					if (getType(left) == UnitType.player)
+					if (getUnit(left).getUnitType() == UnitType.player)
 						adjacentPlayers.add(Direction.left);
 				if (getX() < Const.MAP_WIDTH - 1)
-					if (getType(right) == UnitType.player)
+					if (getUnit(right).getUnitType() == UnitType.player)
 						adjacentPlayers.add(Direction.right);
 
 				// Pick a random player to attack

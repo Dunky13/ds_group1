@@ -61,4 +61,18 @@ public class Coordinate implements Serializable
 		this.y = y;
 	}
 
+	/**
+	 * Checks lower, upper bound of 2D coordinate lower_val is inclusive.
+	 * upper_val is exclusive.
+	 * 
+	 * @param lower_x
+	 * @param upper_x
+	 * @param lower_y
+	 * @param upper_y
+	 * @return Whether or not Coordinate is in bounds.
+	 */
+	public boolean inBound(int lower_x, int upper_x, int lower_y, int upper_y)
+	{
+		return this.x >= lower_x && this.x < upper_x && this.y >= lower_y && this.y < upper_y;
+	}
 }
