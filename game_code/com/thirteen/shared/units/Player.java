@@ -165,7 +165,7 @@ public class Player extends Unit implements Runnable, Serializable
 
 				UnitType ut = u.getUnitType();
 				// Attack can happen only in attack range and only in one direction
-				if (distance <= Player.MAX_ATTACT_RANGE && (i == 0 || j == 0))
+				if (distance <= Player.MAX_ATTACT_RANGE)
 				{
 					if (ut == UnitType.undefined)
 						continue; //if in attack range, check for player & dragon
