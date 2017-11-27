@@ -18,9 +18,8 @@ public class Logger {
 		filename="DAS_Game_log.txt";
 		logFolderName =  getClass().getProtectionDomain().getCodeSource().getLocation().toString();
 		logFolderName += "logger/Logs"; //Change "logger" to package path
-		fullFilePath= logFolderName + "/" + filename;
 		logFolderName = logFolderName.replace(remove, "");
-		fullFilePath = fullFilePath.replace(remove, "");
+		fullFilePath= logFolderName + "/" + filename;
 	}
 	
 	
