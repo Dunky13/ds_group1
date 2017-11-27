@@ -1,5 +1,7 @@
 package com.thirteen.shared;
 
+import com.thirteen.shared.communication.ServerLocation;
+
 public interface Const
 {
 	int NUMBER_OF_SERVERS = 5;
@@ -11,4 +13,12 @@ public interface Const
 
 	int MAP_WIDTH = 25;
 	int MAP_HEIGHT = 25;
+	
+	ServerLocation[] SERVER_LOCATIONS = new ServerLocation[] {
+			new ServerLocation("localhost", 8480),
+			new ServerLocation("localhost", 8481),
+			new ServerLocation("localhost", 8482),
+			new ServerLocation("localhost", 8483),
+			new ServerLocation("localhost", 8484),
+			};
 }
