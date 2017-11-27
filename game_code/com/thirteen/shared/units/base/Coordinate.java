@@ -61,18 +61,29 @@ public class Coordinate implements Serializable
 		this.y = y;
 	}
 
-	/**
-	 * Checks lower, upper bound of 2D coordinate lower_val is inclusive.
-	 * upper_val is exclusive.
-	 * 
-	 * @param lower_x
-	 * @param upper_x
-	 * @param lower_y
-	 * @param upper_y
-	 * @return Whether or not Coordinate is in bounds.
-	 */
-	public boolean inBound(int lower_x, int upper_x, int lower_y, int upper_y)
+	public int distanceTo(Coordinate target)
 	{
-		return this.x >= lower_x && this.x < upper_x && this.y >= lower_y && this.y < upper_y;
+		int deltaX = Math.abs(this.getX() - target.getX());
+		int deltaY = Math.abs(this.getY() - target.getY());
+		return deltaX + deltaY;
+	}
+
+	public Coordinate offset(int x, int y)
+	{
+		return new Coordinate(this, x, y);
+	}
+
+	public Direction directionTo(Coordinate target)
+	{
+		//TODO: Maybe create a list of directions left & up or right & up. If one side is blocked, do the other direction.
+		if (this.getX() > target.getX())
+			return Direction.left;
+		else if (this.getX() < target.getX())
+			return Direction.right;
+		else if (this.getY() > target.getY())
+			return Direction.up;
+		else if (this.getY() < target.getY())
+			return Direction.down;
+		return null;
 	}
 }
