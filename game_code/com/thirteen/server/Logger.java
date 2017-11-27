@@ -1,6 +1,6 @@
 package com.thirteen.server;
 
-import com.thirteen.shared.Message;
+import com.thirteen.shared.communication.Message;
 import java.io.*;
 import java.util.Iterator;
 import java.util.Map;

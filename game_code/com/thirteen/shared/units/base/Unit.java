@@ -3,8 +3,8 @@ package com.thirteen.shared.units.base;
 import java.io.Serializable;
 import com.thirteen.client.Client;
 import com.thirteen.shared.GameField;
-import com.thirteen.shared.Message;
-import com.thirteen.shared.MessageRequest;
+import com.thirteen.shared.communication.Message;
+import com.thirteen.shared.communication.MessageRequest;
 
 /**
  * Base class for all players whom can participate in the DAS game. All

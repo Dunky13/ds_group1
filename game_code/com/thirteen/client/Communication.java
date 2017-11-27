@@ -3,7 +3,7 @@ package com.thirteen.client;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.thirteen.shared.Message;
+import com.thirteen.shared.communication.Message;
 import com.thirteen.shared.core.IMessageReceivedHandler;
 import com.thirteen.shared.core.LocalSocket;
 import com.thirteen.shared.core.Socket;

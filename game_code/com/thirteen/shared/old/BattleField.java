@@ -1,8 +1,8 @@
 package com.thirteen.shared.old;
 
 import java.util.ArrayList;
-import com.thirteen.shared.Message;
-import com.thirteen.shared.MessageRequest;
+import com.thirteen.shared.communication.Message;
+import com.thirteen.shared.communication.MessageRequest;
 import com.thirteen.shared.core.IMessageReceivedHandler;
 import com.thirteen.shared.core.LocalSocket;
 import com.thirteen.shared.core.Socket;

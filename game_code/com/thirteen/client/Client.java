@@ -4,7 +4,7 @@
 package com.thirteen.client;
 
 import com.thirteen.shared.GameField;
-import com.thirteen.shared.Message;
+import com.thirteen.shared.communication.Message;
 import com.thirteen.shared.units.Dragon;
 import com.thirteen.shared.units.Player;
 import com.thirteen.shared.units.base.Unit;

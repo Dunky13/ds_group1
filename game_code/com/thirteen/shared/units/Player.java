@@ -4,7 +4,7 @@ import java.io.Serializable;
 import com.thirteen.client.Client;
 import com.thirteen.shared.Const;
 import com.thirteen.shared.GameState;
-import com.thirteen.shared.Message;
+import com.thirteen.shared.communication.Message;
 import com.thirteen.shared.units.base.Coordinate;
 import com.thirteen.shared.units.base.Direction;
 import com.thirteen.shared.units.base.Unit;

@@ -2,7 +2,7 @@ package com.thirteen.shared.core;
 
 import com.thirteen.client.Communication;
 import com.thirteen.shared.GameField;
-import com.thirteen.shared.Message;
+import com.thirteen.shared.communication.Message;
 import com.thirteen.shared.core.exception.AlreadyAssignedIDException;
 import com.thirteen.shared.core.exception.IDNotAssignedException;
 

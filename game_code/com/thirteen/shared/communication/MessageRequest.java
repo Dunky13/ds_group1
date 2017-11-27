@@ -1,4 +1,4 @@
-package com.thirteen.shared;
+package com.thirteen.shared.communication;
 
 /**
  * Different request types for the
