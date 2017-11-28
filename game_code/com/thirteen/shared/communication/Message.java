@@ -1,15 +1,15 @@
-package com.thirteen.shared;
+package com.thirteen.shared.communication;
 
-import java.util.HashMap;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Iterator;
 
-import com.thirteen.shared.units.Unit;
-
+import com.thirteen.shared.units.base.Unit;
 
 public class Message implements Serializable {
 	
-	private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = -5755419668337780923L;
+
 	HashMap<String,Serializable> contents;
 	
 	public Message(){
@@ -38,5 +38,8 @@ public class Message implements Serializable {
 		return contents.toString();
 	}
 	
+	public Iterator<?> getIterator() {
+		return contents.entrySet().iterator();
+	}
 	
 }
