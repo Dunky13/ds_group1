@@ -22,7 +22,7 @@ public class ServerClock {
 	
 	//Call when clock needs to advance by more than 1
 	public synchronized void advanceClock(int recvValue){
-		currentValue = (currentValue > recvValue) ? currentValue++ : ++recvValue ;
+		currentValue = (currentValue > recvValue) ? currentValue +1 : recvValue +1 ;
 	}
 
 	public synchronized int getClockValue(){
