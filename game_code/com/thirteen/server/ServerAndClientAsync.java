@@ -10,11 +10,19 @@ import java.nio.channels.CompletionHandler;
 import java.nio.charset.Charset;
 import java.util.concurrent.Future;
 
+
+
+
 public class ServerAndClientAsync {
 
-  private static void spawnClient() throws Exception {
+  private static void spawnClient() {
+    try {
     AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
-    SocketAddress serverAddr = new InetSocketAddress("localhost", 8989);
+    System.out.print("\u001B[33m" + "Please enter a  message  (Bye  to quit): " + "\u001B[0m");
+    String msg = (new BufferedReader(new InputStreamReader(System.in))).readLine();
+    System.out.print("\u001B[33m" + "Please enter a  port to send the message to: " + "\u001B[0m");
+    int port = Integer.parseInt((new BufferedReader(new InputStreamReader(System.in))).readLine());
+    SocketAddress serverAddr = new InetSocketAddress("localhost", port);
     Future<Void> result = channel.connect(serverAddr);
     result.get();
     System.out.println("Connected");
@@ -24,7 +32,7 @@ public class ServerAndClientAsync {
     attach.isRead = false;
     // attach.mainThread = Thread.currentThread();
     Charset cs = Charset.forName("UTF-8");
-    String msg = "Hello";
+    //String msg = "Hello";
     byte[] data = msg.getBytes(cs);
     attach.buffer.put(data);
     attach.buffer.flip();
@@ -34,24 +42,31 @@ public class ServerAndClientAsync {
     Thread clientThread = new Thread();
     attach.mainThread = clientThread;
     attach.mainThread.join();
+    } catch(Exception e) {
+      
+    }
   }
 
-  private static void spawnServer() throws Exception {
+  private static void spawnServer(int p) throws Exception {
     AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
     String host = "localhost";
-    int port = 8990;
+    int port = p;
     InetSocketAddress sAddr = new InetSocketAddress(host, port);
     server.bind(sAddr);
-    System.out.format("Server is listening at %s%n", sAddr);
+    System.out.format("\u001B[35m" + "Server is listening at %s%n" + "\u001B[0m", sAddr);
     Attachment attach2 = new Attachment();
     attach2.server = server;
     server.accept(attach2, new ConnectionHandler());
     Thread.currentThread().join();
   }
   
-  public static void main(String[] args) throws Exception {    
+  public static void main(String[] args) throws Exception {        
+    if(args.length != 1) {
+      System.out.println("missing server port argument");
+      System.exit(1);
+    }
     spawnClient();
-    spawnServer();    
+    spawnServer(Integer.parseInt(args[0]));    
   }
 }
 
@@ -61,7 +76,7 @@ class ConnectionHandler implements
   public void completed(AsynchronousSocketChannel client, Attachment attach) {
     try {
       SocketAddress clientAddr = client.getRemoteAddress();
-      System.out.format("Accepted a  connection from  %s%n", clientAddr);
+      System.out.format("\u001B[35m" + "Accepted a  connection from  %s%n" + "\u001B[0m", clientAddr);
       attach.server.accept(attach, this);
       ReadWriteHandlerServer rwHandler = new ReadWriteHandlerServer();
       Attachment newAttach = new Attachment();
@@ -78,7 +93,7 @@ class ConnectionHandler implements
 
   @Override
   public void failed(Throwable e, Attachment attach) {
-    System.out.println("Failed to accept a  connection.");
+    System.out.println("\u001B[35m" + "Failed to accept a  connection." + "\u001B[0m");
     e.printStackTrace();
   }
 }
@@ -89,7 +104,7 @@ class ReadWriteHandlerServer implements CompletionHandler<Integer, Attachment> {
     if (result == -1) {
       try {
         attach.channel.close();
-        System.out.println("Stopped listening to the client %s%n",
+        System.out.format("\u001B[35m" + "Stopped listening to the client %s%n" + "\u001B[0m",
             attach.clientAddr);
       } catch (IOException ex) {
         ex.printStackTrace();
@@ -104,7 +119,7 @@ class ReadWriteHandlerServer implements CompletionHandler<Integer, Attachment> {
       attach.buffer.get(bytes, 0, limits);
       Charset cs = Charset.forName("UTF-8");
       String msg = new String(bytes, cs);
-      System.out.format("Client at  %s  says: %s%n", attach.clientAddr,
+      System.out.format("\u001B[35m" + "Client at  %s  says: %s%n" + "\u001B[0m", attach.clientAddr,
           msg);
       attach.isRead = false; // to rm
       attach.buffer.rewind();      
@@ -134,10 +149,12 @@ class ReadWriteHandlerClient implements CompletionHandler<Integer, Attachment> {
       byte bytes[] = new byte[limits];
       attach.buffer.get(bytes, 0, limits);
       String msg = new String(bytes, cs);
-      System.out.println("Server Responded: "+ msg);
+      int port = 0;
+      System.out.println("\u001B[33m" + "Server Responded: "+ msg + "" + "\u001B[0m");
       try {
         // ask the user for another message to send to server
         msg = this.getTextFromUser();
+        port = this.getPortFromUser();
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -161,10 +178,14 @@ class ReadWriteHandlerClient implements CompletionHandler<Integer, Attachment> {
   public void failed(Throwable e, Attachment attach) {
     e.printStackTrace();
   }
-  private String getTextFromUser() throws Exception{
-    System.out.print("Please enter a  message  (Bye  to quit): ");
+  private String getTextFromUser() throws Exception {
+    System.out.print("\u001B[33m" + "Please enter a  message  (Bye  to quit): " + "\u001B[0m");
     BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
     String msg = consoleReader.readLine();
     return msg;
+  }
+  private int getPortFromUser() throws Exception {
+    System.out.print("\u001B[33m" + "Please enter a  port to send the message to: " + "\u001B[0m");
+    return Integer.parseInt((new BufferedReader(new InputStreamReader(System.in))).readLine());
   }
 }
