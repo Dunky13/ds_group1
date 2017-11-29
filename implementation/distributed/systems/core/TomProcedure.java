@@ -46,6 +46,7 @@ public class TomProcedure{
 	private String mcIP = null;
 	private MulticastSocket mcs=null;
 	private InetAddress mcIpAddress=null;
+	private ExecutorService service;
 	private final int THREAD_POOL_SIZE = 10; //just an arbitrary number so far
 	
 	//1)Insertion in this queue signifies the start of the Tom process for that message.
@@ -60,8 +61,7 @@ public class TomProcedure{
 	//4) Queue for the thread pool that processes all incoming messages
 	//Differentiation is done based on message type
 	public LinkedBlockingQueue<Message> receivedMsgQueue;
-	ExecutorService service;
-	
+		
 	
 	//Default Constructor
 	public TomProcedure(String serverId, String multiCastIP, int multiCastPort){
@@ -161,12 +161,12 @@ public class TomProcedure{
 		return rtnMsg;
 	}
 	
-	public void moveToLocalUndeliverables(Message msg, int localLC) {
-		msg.put("isDeliverable", 0);
-		msg.put("LC", localLC);
-		unDeliverablesQueue.add(msg);
-		
-	}
+//	public void moveToLocalUndeliverables(Message msg, int localLC) {
+//		msg.put("isDeliverable", 0);
+//		msg.put("LC", localLC);
+//		unDeliverablesQueue.add(msg);
+//		
+//	}
 	
 	
 	/**
@@ -194,21 +194,7 @@ public class TomProcedure{
 	}
 	
 	
-	/**
-	 * Returns the maximum value from the provided input.
-	 * Use for deciding which LC value to use for a given message,
-	 * after voting occurs between the servers.
-	 * @param tss
-	 * @return
-	 */
-	public int computeMax(int...tss) {
-		int result=0;
-		
-		for (int ts : tss) {
-			if (ts > result)result=ts;
-		}
-		return result;
-	}
+
 	
 /**
  * Custom comparator class for insertionsort in the execution queue.
@@ -225,9 +211,6 @@ class LCpriority implements Comparator<Message>{
 }
 	
 	
-	
-	
+		
 }
-
-
 
