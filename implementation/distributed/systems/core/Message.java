@@ -38,5 +38,14 @@ public class Message implements Serializable {
 		return contents.toString();
 	}
 	
+		
+	public Iterator getIterator() {
+		return contents.entrySet().iterator();
+	}
+
+	public void removeMsgKeyVal(String key) {
+		contents.remove(key);
+	}
+	
 	
 }
