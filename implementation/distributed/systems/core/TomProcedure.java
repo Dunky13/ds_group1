@@ -19,13 +19,20 @@ package distributed.systems.core;
 import java.util.Comparator;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.MulticastSocket;
+import java.net.InetAddress;
+import java.net.DatagramPacket;
+import java.util.concurrent.*;
 
 import distributed.systems.core.*;
 import distributed.systems.core.logger.Logger;
 
-//Types of messages
+//Types of messages wrt to threads
 //Originator (new) message = 1
 //Proposed LC message = 2
 //Final LC message = 3
@@ -35,9 +42,14 @@ public class TomProcedure{
 	Logger logger;
 	private String[][] listOfServersAndPorts;
 	private String localServerId;
+	private int mcPort;
+	private String mcIP = null;
+	private MulticastSocket mcs=null;
+	private InetAddress mcIpAddress=null;
+	private final int THREAD_POOL_SIZE = 10; //just an arbitrary number so far
 	
 	//1)Insertion in this queue signifies the start of the Tom process for that message.
-	private static LinkedBlockingQueue <Message> processQueue;
+	public static LinkedBlockingQueue <Message> processQueue;
 	
 	//2)Intermediate queue for undeliverable messages
 	private static LinkedBlockingQueue <Message> unDeliverablesQueue;
@@ -45,35 +57,79 @@ public class TomProcedure{
 	//3)Final Q in process. Messages in this Q are ready to be executed.
 	public PriorityBlockingQueue <Message> executionQueue;
 	
-	private MulticastSocket m;
+	//4) Queue for the thread pool that processes all incoming messages
+	//Differentiation is done based on message type
+	public LinkedBlockingQueue<Message> receivedMsgQueue;
+	ExecutorService service;
+	
 	
 	//Default Constructor
-	public TomProcedure(String serverId){
+	public TomProcedure(String serverId, String multiCastIP, int multiCastPort){
 		processQueue = new LinkedBlockingQueue<Message>();
 		unDeliverablesQueue = new  LinkedBlockingQueue<Message>();
 		LCpriority lcPriority = new LCpriority();
 		executionQueue = new PriorityBlockingQueue<Message>(1000,lcPriority);
+		service = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 		logger = new Logger();
 		localServerId = serverId;
+		mcIP = multiCastIP;
+		mcPort = multiCastPort;
 		try {
-			m = new MulticastSocket();
+			mcIpAddress = InetAddress.getByName(mcIP);
+			mcs = new MulticastSocket(mcPort);
+			System.out.println("Multicast member running at: " + mcs.getLocalSocketAddress() + " .Attempting to join Multicast group...");
+			logger.logText("Multicast member running at: " + mcs.getLocalSocketAddress() + " .Attempting to join Multicast group...");
+			mcs.joinGroup(mcIpAddress);
+			
+			//Test code for mcs send.
+			//Move to a TOM thread after testing.
+			Message tstMsg = new Message();
+			tstMsg.put("TestId", 1);
+			tstMsg.put("TestAction", "spawn");
+			tstMsg.put("Test", "Hello socket");
+			logger.logText("Will attempt to send the following message:");
+			logger.logMessage(tstMsg);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		    ObjectOutputStream oos = new ObjectOutputStream(baos);
+		    oos.writeObject(tstMsg);
+		    oos.close();
+		    //System.out.println("Message Data size: " + baos.size());
+			byte[] buf = baos.toByteArray();
+			DatagramPacket pckt = new DatagramPacket(buf,buf.length);
+			mcs.send(pckt);
+			//Test code for the receiving side.
+			
+			byte[] recvbuf = new byte[1000];
+			DatagramPacket r_pckt = new DatagramPacket(recvbuf,recvbuf.length);
+			mcs.receive(r_pckt);
+			ByteArrayInputStream r_baos = new ByteArrayInputStream(recvbuf);
+		    ObjectInputStream r_oos = new ObjectInputStream(r_baos);
+			Message r_msg = (Message)r_oos.readObject();
+			r_oos.close();
+			logger.logText("Attempting to read received message:");
+		    logger.logMessage(r_msg);
+			//End of test code
+			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// Handle
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// thrown by r_oos.readObject();
 			e.printStackTrace();
 		}
-		//m.
+		
 		
 	}
 	
 	//QUEUE METHODS
 	
 	/**
-	 * The whole TOM process packed into a single method.
-	 * No return type 
+	 * Message submital to TOM proc is decoupled from the process itself.
+	 * Fire-and-forget style.
 	 * @param msg
 	 * @param LC
 	 */
-	public void submitMsgToTOM(Message msg, int LC) {
+	public synchronized void submitMsgToTOM(Message msg, int LC) {
 		msg.put("LC", LC);
 		msg.put("serverID", localServerId);	
 		processQueue.add(msg);
@@ -88,10 +144,36 @@ public class TomProcedure{
 	}
 	
 	
+	
+	public void startTomProc() {
+		
+	}
+	
+	
+	/**
+	 * To be called by threads in the receiver thread pool
+	 * @return
+	 */
+	public Message deQueueMsgForThreadPool() {
+		Message rtnMsg;
+		rtnMsg = receivedMsgQueue.remove();
+		logger.logMessage(rtnMsg);
+		return rtnMsg;
+	}
+	
+	public void moveToLocalUndeliverables(Message msg, int localLC) {
+		msg.put("isDeliverable", 0);
+		msg.put("LC", localLC);
+		unDeliverablesQueue.add(msg);
+		
+	}
+	
+	
 	/**
 	 * Returns the first available (executable) action
 	 * @return msg
 	 */
+	// this can be done by a separate threads who continuously pulls the head of the execution queue
 	public Message getExecutableMsgFromTOM() {
 		Message msg;
 		msg = executionQueue.remove(); //needs testing
@@ -99,14 +181,12 @@ public class TomProcedure{
 		return msg;
 	}
 	
-	
 	/**
 	 * Method for polling the execution queue for available actions.
 	 * @return
 	 */
 	public boolean isMessageAvailable() {
 		if(!executionQueue.isEmpty() && ((Integer)executionQueue.peek().get("isDeliverable"))==1) {
-			
 			return true;
 		}else {
 			return false;
@@ -131,7 +211,8 @@ public class TomProcedure{
 	}
 	
 /**
- * Custom comparator for insertionsort in the execution queue	
+ * Custom comparator class for insertionsort in the execution queue.
+ * Criteria is the Logical Clock value of the message.	
  * @author vasilis
  */
 class LCpriority implements Comparator<Message>{
