@@ -14,7 +14,7 @@ import java.util.concurrent.Future;
 
 
 public class ServerAndClientAsync {
-
+  public static volatile String spinValue  = "";
   private static final int[] ports = {8989, 8990, 8991, 8992, 8993};
   
   private static void spawnClient(int port) {
@@ -23,8 +23,8 @@ public class ServerAndClientAsync {
         AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
         // System.out.print("\u001B[33m" + "Please enter a  message  (Bye  to quit): " + "\u001B[0m");
         // String msg = (new BufferedReader(new InputStreamReader(System.in))).readLine();
-        //System.out.print("\u001B[33m" + "Please enter a  port to send the message to: " + "\u001B[0m");
-        //int port = Integer.parseInt((new BufferedReader(new InputStreamReader(System.in))).readLine());
+        // System.out.print("\u001B[33m" + "Please enter a  port to send the message to: " + "\u001B[0m");
+        // int port = Integer.parseInt((new BufferedReader(new InputStreamReader(System.in))).readLine());
         String msg = "First connection message";
         SocketAddress serverAddr = new InetSocketAddress("localhost", port);
         Future<Void> result = channel.connect(serverAddr);
@@ -36,21 +36,22 @@ public class ServerAndClientAsync {
         attach.isRead = false;
         // attach.mainThread = Thread.currentThread();
         Charset cs = Charset.forName("UTF-8");
-        //String msg = "Hello";
+        // String msg = "Hello";
         byte[] data = msg.getBytes(cs);
         attach.buffer.put(data);
         attach.buffer.flip();
         ReadWriteHandlerClient readWriteHandler = new ReadWriteHandlerClient();
         channel.write(attach.buffer, attach, readWriteHandler);
         // new client thread that deals with the sending message part
-        //Thread clientThread = new Thread();
-        //attach.mainThread = clientThread;
+        // Thread clientThread = new Thread();
+        // attach.mainThread = clientThread;
         attach.mainThread = Thread.currentThread();
         attach.mainThread.join();
       } catch(Exception e) {
-        System.out.println("Server on port "+port+ " not found .. retrying");
+        //System.out.println("Server on port "+port+ " not found .. retrying");
         try {
-        Thread.currentThread().sleep(4000);
+          // sleeping before trying again
+          Thread.currentThread().sleep(4000);
         } catch (InterruptedException iex) {
           
         }
@@ -70,20 +71,22 @@ public class ServerAndClientAsync {
     server.accept(attach2, new ConnectionHandler());
     Thread.currentThread().join();
   }
+
+  private static void modifySharedVairable() {
+    System.out.print("\u001B[32m" + "enter a string in the shared variable: " + "\u001B[0m");
+    try {
+    String msg = (new BufferedReader(new InputStreamReader(System.in))).readLine();
+    spinValue = msg;
+    } catch (Exception e) {
+    }
+  }
   
-  public static void main(String[] args) throws Exception {        
+  public static void main(String[] args) throws Exception {
+    // arguments checking
     if(args.length != 1) {
       System.out.println("missing server port argument");
       System.exit(1);
     }
-    //    spawnClient();
-    // new Thread(() -> {
-    //     spawnClient(9898);
-    // }).start();
-    // new Thread(() -> {
-    //     spawnClient(7777);
-    // }).start();
-
     // Binding a thread to each server
     for (int i : ports) {
       if (i != Integer.parseInt(args[0])) {
@@ -92,6 +95,11 @@ public class ServerAndClientAsync {
         }).start();
       }
     }
+    // ask user for share variable update value
+    new Thread(() -> {
+        modifySharedVairable();
+    }).start();
+    // spawining the actual server
     spawnServer(Integer.parseInt(args[0]));    
   }
 }
@@ -175,19 +183,24 @@ class ReadWriteHandlerClient implements CompletionHandler<Integer, Attachment> {
       byte bytes[] = new byte[limits];
       attach.buffer.get(bytes, 0, limits);
       String msg = new String(bytes, cs);
-      int port = 0;
+      //int port = 0;
       System.out.println("\u001B[33m" + "Server Responded: "+ msg + "" + "\u001B[0m");
       try {
         // ask the user for another message to send to server
-        msg = this.getTextFromUser();
+        //msg = this.getTextFromUser();
         //port = this.getPortFromUser();
       } catch (Exception e) {
         e.printStackTrace();
       }
-      if (msg.equalsIgnoreCase("bye")) {
-        attach.mainThread.interrupt();
-        return;
+      // if (msg.equalsIgnoreCase("bye")) {
+      //   attach.mainThread.interrupt();
+      //   return;
+      // }
+      String prevValue = ServerAndClientAsync.spinValue;
+      while (prevValue.equals(ServerAndClientAsync.spinValue)) {
+        // busy wait
       }
+      msg = ServerAndClientAsync.spinValue;
       attach.buffer.clear();
       byte[] data = msg.getBytes(cs);
       attach.buffer.put(data);
