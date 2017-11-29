@@ -16,14 +16,20 @@ package distributed.systems.core;
  */
 
 
+import java.util.Comparator;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.io.IOException;
+import java.net.MulticastSocket;
 
 import distributed.systems.core.*;
 import distributed.systems.core.logger.Logger;
 
+//Types of messages
+//Originator (new) message = 1
+//Proposed LC message = 2
+//Final LC message = 3
 
-//Have this class extend Thread??
 public class TomProcedure{
 	private final int timeout = 1000;
 	Logger logger;
@@ -37,15 +43,26 @@ public class TomProcedure{
 	private static LinkedBlockingQueue <Message> unDeliverablesQueue;
 	
 	//3)Final Q in process. Messages in this Q are ready to be executed.
-	public LinkedBlockingQueue <Message> executionQueue;
+	public PriorityBlockingQueue <Message> executionQueue;
+	
+	private MulticastSocket m;
 	
 	//Default Constructor
 	public TomProcedure(String serverId){
 		processQueue = new LinkedBlockingQueue<Message>();
 		unDeliverablesQueue = new  LinkedBlockingQueue<Message>();
-		executionQueue = new LinkedBlockingQueue<Message>();
+		LCpriority lcPriority = new LCpriority();
+		executionQueue = new PriorityBlockingQueue<Message>(1000,lcPriority);
 		logger = new Logger();
 		localServerId = serverId;
+		try {
+			m = new MulticastSocket();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//m.
+		
 	}
 	
 	//QUEUE METHODS
@@ -63,12 +80,11 @@ public class TomProcedure{
 		//Should return and have a separate thread take over the rest of the process
 		//otherwise this blocks.
 		//Step 1: Multicast the timestamped message
-		//Step 2: Everyone stores the message as undeliverable
+		//Step 2: Upon receival everyone stores the message as undeliverable  (including the originator)
 		//Step 3: Wait for other processes to send their proposed timestamps
 		//Step 4: Gather the  timestamps values and figure out the MAX 
 		//Step 5: Multicast the MAX timestamp so that everyone can append it to the message
-		//Step 6: Mark the message as deliverable on each server, and pass it to the execution queue
-				
+		//Step 6: Mark the message as deliverable on each server, and pass it to the execution queue			
 	}
 	
 	
@@ -90,113 +106,18 @@ public class TomProcedure{
 	 */
 	public boolean isMessageAvailable() {
 		if(!executionQueue.isEmpty() && ((Integer)executionQueue.peek().get("isDeliverable"))==1) {
+			
 			return true;
 		}else {
 			return false;
 		}	
 	}
 	
-//	
-//	/**
-//	 * Call on msg receive by a client, local Logical Clock should be adjusted
-//	 * before passing it here.
-//	 * @param msg
-//	 * @param LC
-//	 */
-//	public void insertInProcessQ(Message msg, int LC) {
-//		msg.put("LC", LC);
-//		msg.put("serverID", localServerId);
-//		try {
-//			processQueue.put(msg);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//	}
-//	
-//	/**
-//	 * 
-//	 */
-//	public void processProcessQueueMessage(Message msg) {
-//		if(!processQueue.isEmpty()) {
-//			//Step 1: Multicast the timestamped message
-//			//Step 2: Wait for other processes to send their proposed timestamps
-//			//processQueue.remove();
-//			insertInUnDeliverablesQueue(msg);
-//			
-//		}else {
-//			//zzzzzzz...
-//			System.out.println("Process Q was empty on processProcessQueueMessage call..");
-//		}
-//		
-//	}
-//	
-//	/**
-//	 * 
-//	 * @param msg
-//	 * @throws InterruptedException 
-//	 */
-//	public void insertInUnDeliverablesQueue(Message msg){
-//		msg.put("isDeliverable", 0);
-//		try {
-//			unDeliverablesQueue.put(msg);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-//	}
-//	
-//	/**
-//	 * 
-//	 */
-//	public void processUnDeliverablesQueueMessage(Message msg) {
-//		if(!unDeliverablesQueue.isEmpty()) {
-//			
-//			
-//			//Before exiting mark the msg and add it to the exec Q
-//			msg.put("isDeliverable", 1);
-//			insertInExcecutionQueue(msg);
-//		}else {
-//			//zzzzzzz...
-//		}	
-//	}
-//	
-//	/**
-//	 * 
-//	 * @param msg
-//	 */
-//	public void insertInExcecutionQueue(Message msg) {
-//		if ((Integer) msg.get("isDeliverable")==1) {
-//			try {
-//				executionQueue.put(msg);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}else {
-//			System.out.println("insertInExcecutionQueue called with unDeliverable msg");
-//		}
-//	}
-//	
-//	/**
-//	 * Takes the first Message in the queue, pops it and returns it
-//	 * back so that it can be applied on the Battlefield. Can return
-//	 * null if called while the Q is empty.
-//	 */
-//	public Message processExcecutionQueueMessage(Message msg) {
-//		if(!executionQueue.isEmpty()) {
-//			Message tempMsg = executionQueue.remove();
-//			return tempMsg;
-//		}else {
-//			//zzzzzz
-//			System.out.println("processExcecutionQueueMessage called while Q was empty");
-//			return null;
-//		}
-//	}
 	
-	
-	//Helper methods
 	/**
-	 * Computes and returns the max timestamp between the input params
+	 * Returns the maximum value from the provided input.
+	 * Use for deciding which LC value to use for a given message,
+	 * after voting occurs between the servers.
 	 * @param tss
 	 * @return
 	 */
@@ -209,6 +130,18 @@ public class TomProcedure{
 		return result;
 	}
 	
+/**
+ * Custom comparator for insertionsort in the execution queue	
+ * @author vasilis
+ */
+class LCpriority implements Comparator<Message>{
+	
+	public int compare(Message m1, Message m2) {
+		
+		return Integer.compare((Integer)m1.get("LC"), (Integer)m2.get("LC"));
+	}
+	
+}
 	
 	
 	
