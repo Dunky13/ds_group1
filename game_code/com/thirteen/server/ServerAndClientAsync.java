@@ -73,11 +73,13 @@ public class ServerAndClientAsync {
   }
 
   private static void modifySharedVairable() {
-    System.out.print("\u001B[32m" + "enter a string in the shared variable: " + "\u001B[0m");
-    try {
-    String msg = (new BufferedReader(new InputStreamReader(System.in))).readLine();
-    spinValue = msg;
-    } catch (Exception e) {
+    while (true) {
+      System.out.print("\u001B[32m" + "enter a string in the shared variable: " + "\u001B[0m");
+      try {
+        String msg = (new BufferedReader(new InputStreamReader(System.in))).readLine();
+        spinValue = msg;
+      } catch (Exception e) {
+      }
     }
   }
   
@@ -158,6 +160,7 @@ class ReadWriteHandlerServer implements CompletionHandler<Integer, Attachment> {
       attach.isRead = false; // to rm
       attach.buffer.rewind();      
       // Mirror: send back the received message to client
+      // TODO here change the volatile common value
       attach.channel.write(attach.buffer, attach, this);
       attach.isRead = true;
       attach.buffer.clear();
