@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import distributed.systems.das.BattleField;
 import distributed.systems.das.GameState;
+import distributed.systems.das.units.extra.Direction;
+import distributed.systems.das.units.extra.UnitType;
 
 /**
  * A dragon is a non-playing character, which can't
@@ -36,8 +38,8 @@ public class Dragon extends Unit implements Runnable, Serializable {
 	/**
 	 * Spawn a new dragon, initialize the 
 	 * reaction speed 
-	 *
 	 */
+	//include url and ports
 	public Dragon(int x, int y) {
 		/* Spawn the dragon with a random number of hitpoints between
 		 * 50..100 and 5..20 attackpoints. */
