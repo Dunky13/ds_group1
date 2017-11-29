@@ -7,13 +7,15 @@ import java.util.Map;
 import distributed.systems.das.BattleField;
 import distributed.systems.das.GameState;
 import distributed.systems.das.MessageRequest;
+import distributed.systems.das.units.extra.Coordinate;
+import distributed.systems.das.units.extra.UnitType;
 import distributed.systems.core.IMessageReceivedHandler;
 import distributed.systems.core.Message;
 import distributed.systems.core.Socket;
 import distributed.systems.core.SynchronizedSocket;
 import distributed.systems.core.exception.AlreadyAssignedIDException;
 import distributed.systems.core.exception.IDNotAssignedException;
-import distributed.systems.example.LocalSocket;
+//import distributed.systems.example.LocalSocket;//???
 
 /**
  * Base class for all players whom can 
@@ -55,14 +57,8 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler {
 	 * (See stopRunnerThread())
 	 */
 	protected Thread runnerThread;
-
-	public enum Direction {
-		up, right, down, left
-	};
 	
-	public enum UnitType {
-		player, dragon, undefined,
-	};
+	
 
 	/**
 	 * Create a new unit and specify the 
@@ -72,8 +68,9 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler {
 	 * @param maxHealth is the maximum health of 
 	 * this specific unit.
 	 */
+	//include url + port
 	public Unit(int maxHealth, int attackPoints) {
-		Socket localSocket = new LocalSocket();
+		Socket localSocket = new Socket();
 
 		messageList = new HashMap<Integer, Message>();
 
@@ -97,7 +94,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler {
 			System.err.println("Socket \"D" + unitID + "\" was already registered.");
 		}
 
-		clientSocket.addMessageReceivedHandler(this);
+		clientSocket.addMessageReceiveHandler(this);
 	}
 
 	/**
@@ -218,7 +215,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler {
 	 * Tries to make the unit spawn at a certain location on the battlefield
 	 * @param x x-coordinate of the spawn location
 	 * @param y y-coordinate of the spawn location
-	 * @return true iff the unit could spawn at the location on the battlefield
+	 * @return true if the unit could spawn at the location on the battlefield
 	 */
 	protected boolean spawn(int x, int y) {
 		/* Create a new message, notifying the board
@@ -378,5 +375,9 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler {
 			assert(false) : "Unit stopRunnerThread was interrupted";
 		}
 		
+	}
+	
+	public Coordinate getPosition() {
+		return new Coordinate(x, y);
 	}
 }
