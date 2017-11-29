@@ -15,35 +15,46 @@ import java.util.concurrent.Future;
 
 public class ServerAndClientAsync {
 
-  private static void spawnClient() {
-    try {
-    AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
-    System.out.print("\u001B[33m" + "Please enter a  message  (Bye  to quit): " + "\u001B[0m");
-    String msg = (new BufferedReader(new InputStreamReader(System.in))).readLine();
-    System.out.print("\u001B[33m" + "Please enter a  port to send the message to: " + "\u001B[0m");
-    int port = Integer.parseInt((new BufferedReader(new InputStreamReader(System.in))).readLine());
-    SocketAddress serverAddr = new InetSocketAddress("localhost", port);
-    Future<Void> result = channel.connect(serverAddr);
-    result.get();
-    System.out.println("Connected");
-    Attachment attach = new Attachment();
-    attach.channel = channel;
-    attach.buffer = ByteBuffer.allocate(2048);
-    attach.isRead = false;
-    // attach.mainThread = Thread.currentThread();
-    Charset cs = Charset.forName("UTF-8");
-    //String msg = "Hello";
-    byte[] data = msg.getBytes(cs);
-    attach.buffer.put(data);
-    attach.buffer.flip();
-    ReadWriteHandlerClient readWriteHandler = new ReadWriteHandlerClient();
-    channel.write(attach.buffer, attach, readWriteHandler);
-    // new client thread that deals with the sending message part
-    Thread clientThread = new Thread();
-    attach.mainThread = clientThread;
-    attach.mainThread.join();
-    } catch(Exception e) {
-      
+  private static final int[] ports = {8989, 8990, 8991, 8992, 8993};
+  
+  private static void spawnClient(int port) {
+    while(true) {
+      try {
+        AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
+        // System.out.print("\u001B[33m" + "Please enter a  message  (Bye  to quit): " + "\u001B[0m");
+        // String msg = (new BufferedReader(new InputStreamReader(System.in))).readLine();
+        //System.out.print("\u001B[33m" + "Please enter a  port to send the message to: " + "\u001B[0m");
+        //int port = Integer.parseInt((new BufferedReader(new InputStreamReader(System.in))).readLine());
+        String msg = "First connection message";
+        SocketAddress serverAddr = new InetSocketAddress("localhost", port);
+        Future<Void> result = channel.connect(serverAddr);
+        result.get();
+        System.out.println("Connected");
+        Attachment attach = new Attachment();
+        attach.channel = channel;
+        attach.buffer = ByteBuffer.allocate(2048);
+        attach.isRead = false;
+        // attach.mainThread = Thread.currentThread();
+        Charset cs = Charset.forName("UTF-8");
+        //String msg = "Hello";
+        byte[] data = msg.getBytes(cs);
+        attach.buffer.put(data);
+        attach.buffer.flip();
+        ReadWriteHandlerClient readWriteHandler = new ReadWriteHandlerClient();
+        channel.write(attach.buffer, attach, readWriteHandler);
+        // new client thread that deals with the sending message part
+        //Thread clientThread = new Thread();
+        //attach.mainThread = clientThread;
+        attach.mainThread = Thread.currentThread();
+        attach.mainThread.join();
+      } catch(Exception e) {
+        System.out.println("Server on port "+port+ " not found .. retrying");
+        try {
+        Thread.currentThread().sleep(4000);
+        } catch (InterruptedException iex) {
+          
+        }
+      }
     }
   }
 
@@ -65,7 +76,22 @@ public class ServerAndClientAsync {
       System.out.println("missing server port argument");
       System.exit(1);
     }
-    spawnClient();
+    //    spawnClient();
+    // new Thread(() -> {
+    //     spawnClient(9898);
+    // }).start();
+    // new Thread(() -> {
+    //     spawnClient(7777);
+    // }).start();
+
+    // Binding a thread to each server
+    for (int i : ports) {
+      if (i != Integer.parseInt(args[0])) {
+        new Thread(() -> {
+            spawnClient(i);
+        }).start();
+      }
+    }
     spawnServer(Integer.parseInt(args[0]));    
   }
 }
@@ -154,7 +180,7 @@ class ReadWriteHandlerClient implements CompletionHandler<Integer, Attachment> {
       try {
         // ask the user for another message to send to server
         msg = this.getTextFromUser();
-        port = this.getPortFromUser();
+        //port = this.getPortFromUser();
       } catch (Exception e) {
         e.printStackTrace();
       }
