@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import distributed.systems.das.units.Dragon;
 import distributed.systems.das.units.Player;
 import distributed.systems.das.units.Unit;
-import distributed.systems.das.units.Unit.UnitType;
+import distributed.systems.das.units.extra.Bound;
+import distributed.systems.das.units.extra.UnitType;
 import distributed.systems.core.IMessageReceivedHandler;
 import distributed.systems.core.Message;
 import distributed.systems.core.Socket;
 import distributed.systems.core.SynchronizedSocket;
 import distributed.systems.core.exception.IDNotAssignedException;
-import distributed.systems.example.LocalSocket;
+//import distributed.systems.example.LocalSocket;//????
 
 /**
  * The actual battlefield where the fighting takes place.
@@ -41,6 +42,7 @@ public class BattleField implements IMessageReceivedHandler {
 	public final static String serverID = "server";
 	public final static int MAP_WIDTH = 25;
 	public final static int MAP_HEIGHT = 25;
+	public final static Bound MAP_BOUND = new Bound(BattleField.MAP_WIDTH, BattleField.MAP_HEIGHT);
 	private ArrayList <Unit> units; 
 
 	/**
@@ -49,7 +51,7 @@ public class BattleField implements IMessageReceivedHandler {
 	 * @param height of the battlefield
 	 */
 	private BattleField(int width, int height) {
-		Socket local = new LocalSocket();
+		Socket local = new LocalSocket();//???
 		
 		synchronized (this) {
 			map = new Unit[width][height];
@@ -271,13 +273,8 @@ public class BattleField implements IMessageReceivedHandler {
 				return;
 		}
 
-		try {
-			if (reply != null)
-				serverSocket.sendMessage(reply, origin);
-		}
-		catch(IDNotAssignedException idnae)  {
-			// Could happen if the target already logged out
-		}
+		if (reply != null)
+			serverSocket.sendMessage(reply, origin);
 	}
 
 	/**
