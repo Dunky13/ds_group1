@@ -1,7 +1,7 @@
 import csv
 from operator import itemgetter
 
-''' this script edits the WoWSession session trace provided by ?? as such that:
+''' this script edits the WoWSession session trace provided by the Game Trace Archive as such that:
 
 - Only PLAYER_LOGIN and PLAYER_LOGOUT events are stored.
 
