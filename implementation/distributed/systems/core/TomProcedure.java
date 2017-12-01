@@ -14,7 +14,12 @@ package distributed.systems.core;
  * 
  * @author Vasilis Gkanasoulis 
  */
-
+//Step 1: Multicast the timestamped message
+//Step 2: Upon receival everyone stores the message as undeliverable  (including the originator)
+//Step 3: Wait for other processes to send their proposed timestamps
+//Step 4: Gather the  timestamps values and figure out the MAX 
+//Step 5: Multicast the MAX timestamp so that everyone can append it to the message
+//Step 6: Mark the message as deliverable on each server, and pass it to the execution queue	
 
 import java.util.Comparator;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -26,7 +31,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.MulticastSocket;
 import java.net.InetAddress;
-import java.net.DatagramPacket;
 import java.util.concurrent.*;
 
 import distributed.systems.core.*;
@@ -40,12 +44,12 @@ import distributed.systems.core.logger.Logger;
 public class TomProcedure{
 	private final int timeout = 1000;
 	Logger logger;
+	ServerClock LC;
+	SenderThread ST;
+	ReceiverThread RT;
+	ProposedTimestamps PT;
 	private String[][] listOfServersAndPorts;
 	private String localServerId;
-	private int mcPort;
-	private String mcIP = null;
-	private MulticastSocket mcs=null;
-	private InetAddress mcIpAddress=null;
 	private ExecutorService service;
 	private final int THREAD_POOL_SIZE = 10; //just an arbitrary number so far
 	
@@ -64,7 +68,7 @@ public class TomProcedure{
 		
 	
 	//Default Constructor
-	public TomProcedure(String serverId, String multiCastIP, int multiCastPort){
+	public TomProcedure(String serverId, ServerClock inLC){
 		processQueue = new LinkedBlockingQueue<Message>();
 		unDeliverablesQueue = new  LinkedBlockingQueue<Message>();
 		LCpriority lcPriority = new LCpriority();
@@ -72,82 +76,44 @@ public class TomProcedure{
 		service = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 		logger = new Logger();
 		localServerId = serverId;
-		mcIP = multiCastIP;
-		mcPort = multiCastPort;
-		try {
-			mcIpAddress = InetAddress.getByName(mcIP);
-			mcs = new MulticastSocket(mcPort);
-			System.out.println("Multicast member running at: " + mcs.getLocalSocketAddress() + " .Attempting to join Multicast group...");
-			logger.logText("Multicast member running at: " + mcs.getLocalSocketAddress() + " .Attempting to join Multicast group...");
-			mcs.joinGroup(mcIpAddress);
-			
-			//Test code for mcs send.
-			//Move to a TOM thread after testing.
-			Message tstMsg = new Message();
-			tstMsg.put("TestId", 1);
-			tstMsg.put("TestAction", "spawn");
-			tstMsg.put("Test", "Hello socket");
-			logger.logText("Will attempt to send the following message:");
-			logger.logMessage(tstMsg);
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		    ObjectOutputStream oos = new ObjectOutputStream(baos);
-		    oos.writeObject(tstMsg);
-		    oos.close();
-		    //System.out.println("Message Data size: " + baos.size());
-			byte[] buf = baos.toByteArray();
-			DatagramPacket pckt = new DatagramPacket(buf,buf.length);
-			mcs.send(pckt);
-			//Test code for the receiving side.
-			
-			byte[] recvbuf = new byte[1000];
-			DatagramPacket r_pckt = new DatagramPacket(recvbuf,recvbuf.length);
-			mcs.receive(r_pckt);
-			ByteArrayInputStream r_baos = new ByteArrayInputStream(recvbuf);
-		    ObjectInputStream r_oos = new ObjectInputStream(r_baos);
-			Message r_msg = (Message)r_oos.readObject();
-			r_oos.close();
-			logger.logText("Attempting to read received message:");
-		    logger.logMessage(r_msg);
-			//End of test code
-			
-		} catch (IOException e) {
-			// Handle
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// thrown by r_oos.readObject();
-			e.printStackTrace();
-		}
-		
-		
+		LC = inLC;
+		PT = new ProposedTimestamps();
+		ST = new SenderThread(processQueue,unDeliverablesQueue,LC,PT);
+		//service.submit(new ReceiverThread(executionQueue, unDeliverablesQueue,receivedMsgQueue,LC,PT));
 	}
 	
 	//QUEUE METHODS
-	
 	/**
-	 * Message submital to TOM proc is decoupled from the process itself.
+	 * Message submition to TOM proc is decoupled from the process itself.
 	 * Fire-and-forget style.
 	 * @param msg
 	 * @param LC
 	 */
-	public synchronized void submitMsgToTOM(Message msg, int LC) {
-		msg.put("LC", LC);
+	public synchronized void submitMsgToTOM(Message msg) {
+		msg.put("LC", LC.getClockValue());
 		msg.put("serverID", localServerId);	
-		processQueue.add(msg);
-		//Should return and have a separate thread take over the rest of the process
-		//otherwise this blocks.
-		//Step 1: Multicast the timestamped message
-		//Step 2: Upon receival everyone stores the message as undeliverable  (including the originator)
-		//Step 3: Wait for other processes to send their proposed timestamps
-		//Step 4: Gather the  timestamps values and figure out the MAX 
-		//Step 5: Multicast the MAX timestamp so that everyone can append it to the message
-		//Step 6: Mark the message as deliverable on each server, and pass it to the execution queue			
+		processQueue.add(msg);		
 	}
-	
 	
 	
 	public void startTomProc() {
-		
+		//ST.run();
 	}
+	
+	
+	/**
+	 * Receiver thread code
+	 */
+//	public void run() {
+//		try {
+//			for(;;) {
+//				service.execute();
+//			}
+//			
+//		}catch (IOException ex) {
+//			service.shutdown();
+//		}	
+//	}
 	
 	
 	/**
@@ -160,13 +126,6 @@ public class TomProcedure{
 		logger.logMessage(rtnMsg);
 		return rtnMsg;
 	}
-	
-//	public void moveToLocalUndeliverables(Message msg, int localLC) {
-//		msg.put("isDeliverable", 0);
-//		msg.put("LC", localLC);
-//		unDeliverablesQueue.add(msg);
-//		
-//	}
 	
 	
 	/**
@@ -192,8 +151,6 @@ public class TomProcedure{
 			return false;
 		}	
 	}
-	
-	
 
 	
 /**
@@ -204,13 +161,10 @@ public class TomProcedure{
 class LCpriority implements Comparator<Message>{
 	
 	public int compare(Message m1, Message m2) {
-		
 		return Integer.compare((Integer)m1.get("LC"), (Integer)m2.get("LC"));
 	}
-	
 }
 	
 	
-		
+	
 }
-
