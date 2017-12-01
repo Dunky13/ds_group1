@@ -10,4 +10,5 @@ class Attachment {
   ByteBuffer buffer;
   SocketAddress clientAddr;
   boolean isRead;
+  int id;
 }
