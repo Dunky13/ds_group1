@@ -3,8 +3,9 @@ package distributed.systems.core;
 import java.util.concurrent.BlockingQueue;
 
 import distributed.systems.core.Message;
+import distributed.systems.das.GameState;
 
-
+//Start the thread like this: thread = new Thread(new SenderThread);
 public class SenderThread implements Runnable 
 {
 	private BlockingQueue<Message> processQueue;
@@ -25,30 +26,32 @@ public class SenderThread implements Runnable
 
 	
 	public void run( ) {
-		//dequeue item from processqueue
-		try {
-			msg = processQueue.take();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		while(GameState.getRunningState()) {
+			//dequeue item from processqueue
+			try {
+				msg = processQueue.take();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		
-		// Send msg to other server
-		msg.put("LC", LC.getClockValue());
-		sendMessageToOtherServers(msg, Constants.ORIGINAL_MSG);
+			// Send msg to other server
+			msg.put("LC", LC.getClockValue());
+			sendMessageToOtherServers(msg, Constants.ORIGINAL_MSG);
 		
-		// move message from processQueue to Undeliverable Queue
-		moveLocalMsgToUndeliverables(msg);
+			// move message from processQueue to Undeliverables Queue
+			moveLocalMsgToUndeliverables(msg);
 		
-		// spin on boolean value in proposedTimestamps or ad timeout value for fault-tolerance
-		while (!proposedTimestamps.receivedAllClocks) {
+			// spin on boolean value in proposedTimestamps or ad timeout value for fault-tolerance
+			while (!proposedTimestamps.receivedAllClocks) {
 			// wait for all clock values
-		}
-		int maxTimestamp = computeMax(proposedTimestamps.localClocks);// compute max and broadcast
-		proposedTimestamps.reset();
+			}
+			int maxTimestamp = computeMax(proposedTimestamps.localClocks);// compute max and broadcast
+			proposedTimestamps.reset();
 		
-		msg.put("maxLC", maxTimestamp);
-		sendMessageToOtherServers(msg, Constants.FINAL_TIMESTAMP_MSG);
+			msg.put("maxLC", maxTimestamp);
+			sendMessageToOtherServers(msg, Constants.FINAL_TIMESTAMP_MSG);
+		}
 	}
 	
 	
@@ -66,7 +69,7 @@ public class SenderThread implements Runnable
 	
 	private void sendMessageToOtherServers(Message msg, int type) {
 		msg.put("type", type);
-		//TO-DO: Multicast
+		//TO-DO: Multicast	
 		
 	}
 	
