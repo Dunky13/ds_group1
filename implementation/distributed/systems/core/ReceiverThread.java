@@ -77,8 +77,7 @@ public class ReceiverThread implements Runnable
 	public void sendLocalLcToOriginator(Message msg){
 		int outgoingServerId = (Integer) msg.get("serverID");
 		//ADD 1 to 1 communication code here towards outgoingServerId
-		//...
-		
+		//...	
 	}
 	
 	
@@ -108,7 +107,6 @@ public class ReceiverThread implements Runnable
 	public void procMaxLcMsg (Message msg, Iterator it) {
 		int msgId = (Integer)msg.get("id");
 		int maxLC = (Integer)msg.get("MaxLC");
-		Message tmpMsg;
 		for(Iterator i=it; it.hasNext();) {//untested
 			Message m = (Message) i.next();
 			if((Integer)m.get("id")==msgId) {
