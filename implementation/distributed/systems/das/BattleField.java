@@ -9,6 +9,8 @@ import distributed.systems.das.units.extra.Bound;
 import distributed.systems.das.units.extra.UnitType;
 import distributed.systems.core.IMessageReceivedHandler;
 import distributed.systems.core.Message;
+import distributed.systems.core.ServerClock;
+import distributed.systems.core.TomProcedure;
 import distributed.systems.core.Socket;
 import distributed.systems.core.SynchronizedSocket;
 import distributed.systems.core.exception.IDNotAssignedException;
@@ -44,7 +46,8 @@ public class BattleField implements IMessageReceivedHandler {
 	public final static int MAP_HEIGHT = 25;
 	public final static Bound MAP_BOUND = new Bound(BattleField.MAP_WIDTH, BattleField.MAP_HEIGHT);
 	private ArrayList <Unit> units; 
-
+	TomProcedure tom;
+	ServerClock LC;
 	/**
 	 * Initialize the battlefield to the specified size 
 	 * @param width of the battlefield
@@ -59,6 +62,9 @@ public class BattleField implements IMessageReceivedHandler {
 			serverSocket = new SynchronizedSocket(local);
 			serverSocket.addMessageReceivedHandler(this);
 			units = new ArrayList<Unit>();
+			//add server is to new
+			tom = new TomProcedure("1",LC);
+			LC = new ServerClock();
 		}
 		
 	}
@@ -195,12 +201,20 @@ public class BattleField implements IMessageReceivedHandler {
 	}
 
 	public void onMessageReceived(Message msg) {
-		Message reply = null;
-		String origin = (String)msg.get("origin");
-		MessageRequest request = (MessageRequest)msg.get("request");
-		Unit unit;
-		switch(request)
-		{
+		tom.submitMsgToTOM(msg);
+	}
+	
+	
+	
+	public void processTomMessages() {
+		if (tom.isMessageAvailable()) {
+			Message msg = tom.getExecutableMsgFromTOM();
+			String origin = (String)msg.get("origin");
+			MessageRequest request = (MessageRequest)msg.get("request");
+			Message reply = null;
+			Unit unit;
+			switch(request)
+			{
 			case spawnUnit:
 				this.spawnUnit((Unit)msg.get("unit"), (Integer)msg.get("x"), (Integer)msg.get("y"));
 				break;
@@ -261,22 +275,28 @@ public class BattleField implements IMessageReceivedHandler {
 				break;
 			}
 			case moveUnit:
-				reply = new Message();
+				//reply = new Message();
 				this.moveUnit((Unit)msg.get("unit"), (Integer)msg.get("x"), (Integer)msg.get("y"));
 				/* Copy the id of the message so that the unit knows 
 				 * what message the battlefield responded to. 
 				 */
-				reply.put("id", msg.get("id"));
+				//reply.put("id", msg.get("id"));
 				break;
 			case removeUnit:
 				this.removeUnit((Integer)msg.get("x"), (Integer)msg.get("y"));
 				return;
+			}
+
+			//if (reply != null)
+			//serverSocket.sendMessage(reply, origin);
 		}
-
-		if (reply != null)
-			serverSocket.sendMessage(reply, origin);
 	}
+		
 
+	
+	
+	
+	
 	/**
 	 * Close down the battlefield. Unregisters
 	 * the serverSocket so the program can 
