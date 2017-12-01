@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 
 public class ServerAndClientAsync {
-  public static volatile String spinValue  = "";
+  //  public static volatile String spinValue  = "";
   private static final int[] ports = {8989, 8990, 8991, 8992, 8993};
   private static ArrayList<Attachment> serverList = new ArrayList<Attachment>();
   private static ArrayList<Integer> aliveServers = new ArrayList<Integer>();
@@ -52,6 +52,7 @@ public class ServerAndClientAsync {
   private static void spawnClient(int port) {
     while(true) {
       try {
+        System.out.println("Dio porco in the spawn client");
         AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
         String msg = "First connection message";
         SocketAddress serverAddr = new InetSocketAddress("localhost", port);
@@ -97,6 +98,7 @@ public class ServerAndClientAsync {
     Thread.currentThread().join();
   }
 
+  // This method will be called with a thred assigned to it whenever a new game move is issued.
   private static void modifySharedVairable() {
     while (true) {
       System.out.print("\u001B[32m" + "enter a string in the shared variable: " + "\u001B[0m");
@@ -243,17 +245,17 @@ class ReadWriteHandlerClient implements CompletionHandler<Integer, Attachment> {
       //   attach.mainThread.interrupt();
       //   return;
       // }
-      String prevValue = ServerAndClientAsync.spinValue;
-      while (prevValue.equals(ServerAndClientAsync.spinValue)) {
-        // busy wait
-      }
-      msg = ServerAndClientAsync.spinValue;
-      attach.buffer.clear();
-      byte[] data = msg.getBytes(cs);
-      attach.buffer.put(data);
-      attach.buffer.flip();
-      attach.isRead = false; // It is a write
-      attach.channel.write(attach.buffer, attach, this);
+      // String prevValue = ServerAndClientAsync.spinValue;
+      // while (prevValue.equals(ServerAndClientAsync.spinValue)) {
+      //   // busy wait
+      // }
+      // msg = ServerAndClientAsync.spinValue;
+      // attach.buffer.clear();
+      // byte[] data = msg.getBytes(cs);
+      // attach.buffer.put(data);
+      // attach.buffer.flip();
+      // attach.isRead = false; // It is a write
+      // attach.channel.write(attach.buffer, attach, this);
     } else {
       attach.isRead = true;
       attach.buffer.clear();
