@@ -9,22 +9,50 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.Charset;
 import java.util.concurrent.Future;
-
-
+import java.util.ArrayList;
 
 
 public class ServerAndClientAsync {
   public static volatile String spinValue  = "";
   private static final int[] ports = {8989, 8990, 8991, 8992, 8993};
+  private static ArrayList<Attachment> serverList = new ArrayList<Attachment>();
+  private static ArrayList<Integer> aliveServers = new ArrayList<Integer>();
+  
+
+  private static void findServers(int myport) {
+    while(true) {
+      try {
+        for (int port : ports) {
+          if (!aliveServers.contains(port) && port != myport) {
+          AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
+          SocketAddress serverAddr = new InetSocketAddress("localhost", port);
+          Future<Void> result = channel.connect(serverAddr);
+          result.get();
+          System.out.println("Connected");
+          SocketAddress clientAddr = channel.getRemoteAddress();
+          System.out.format("\u001B[35m" + "sdfvfvdf Accepted a  connection from  %s%n" + "\u001B[0m", clientAddr);
+          Attachment attach = new Attachment();
+          attach.channel = channel;
+          //attach.id = port;
+          System.out.println("The id: "+attach.id);
+          serverList.add(attach);
+          aliveServers.add(port);
+          if (aliveServers.size() == (ports.length - 1)) {
+            System.out.println("exiting");
+            return;
+          }
+          }
+        }
+      } catch (Exception e) {
+      }      
+    }    
+  }
+
   
   private static void spawnClient(int port) {
     while(true) {
       try {
         AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
-        // System.out.print("\u001B[33m" + "Please enter a  message  (Bye  to quit): " + "\u001B[0m");
-        // String msg = (new BufferedReader(new InputStreamReader(System.in))).readLine();
-        // System.out.print("\u001B[33m" + "Please enter a  port to send the message to: " + "\u001B[0m");
-        // int port = Integer.parseInt((new BufferedReader(new InputStreamReader(System.in))).readLine());
         String msg = "First connection message";
         SocketAddress serverAddr = new InetSocketAddress("localhost", port);
         Future<Void> result = channel.connect(serverAddr);
@@ -42,9 +70,6 @@ public class ServerAndClientAsync {
         attach.buffer.flip();
         ReadWriteHandlerClient readWriteHandler = new ReadWriteHandlerClient();
         channel.write(attach.buffer, attach, readWriteHandler);
-        // new client thread that deals with the sending message part
-        // Thread clientThread = new Thread();
-        // attach.mainThread = clientThread;
         attach.mainThread = Thread.currentThread();
         attach.mainThread.join();
       } catch(Exception e) {
@@ -77,7 +102,20 @@ public class ServerAndClientAsync {
       System.out.print("\u001B[32m" + "enter a string in the shared variable: " + "\u001B[0m");
       try {
         String msg = (new BufferedReader(new InputStreamReader(System.in))).readLine();
-        spinValue = msg;
+        //spinValue = msg;
+        for (Attachment attach : serverList) {
+          attach.buffer = ByteBuffer.allocate(2048);
+          attach.isRead = false;
+          // attach.mainThread = Thread.currentThread();
+          Charset cs = Charset.forName("UTF-8");
+          // String msg = "Hello";
+          byte[] data = msg.getBytes(cs);
+          attach.buffer.put(data);
+          attach.buffer.flip();
+          ReadWriteHandlerClient readWriteHandler = new ReadWriteHandlerClient();
+          attach.channel.write(attach.buffer, attach, readWriteHandler);
+          //          channel.write(attach.buffer, attach, readWriteHandler);
+        }
       } catch (Exception e) {
       }
     }
@@ -90,13 +128,16 @@ public class ServerAndClientAsync {
       System.exit(1);
     }
     // Binding a thread to each server
-    for (int i : ports) {
-      if (i != Integer.parseInt(args[0])) {
-        new Thread(() -> {
-            spawnClient(i);
-        }).start();
-      }
-    }
+    // for (int i : ports) {
+    //   if (i != Integer.parseInt(args[0])) {
+    //     new Thread(() -> {
+    //         spawnClient(i);
+    //     }).start();
+    //   }
+    // }
+    new Thread(() -> {
+        findServers(Integer.parseInt(args[0]));
+    }).start();
     // ask user for share variable update value
     new Thread(() -> {
         modifySharedVairable();
@@ -113,6 +154,7 @@ class ConnectionHandler implements
     try {
       SocketAddress clientAddr = client.getRemoteAddress();
       System.out.format("\u001B[35m" + "Accepted a  connection from  %s%n" + "\u001B[0m", clientAddr);
+      System.out.format("\u001B[35m" + "Accepted a  connection with id  %s%n" + "\u001B[0m", attach.id);
       attach.server.accept(attach, this);
       ReadWriteHandlerServer rwHandler = new ReadWriteHandlerServer();
       Attachment newAttach = new Attachment();
@@ -141,7 +183,9 @@ class ReadWriteHandlerServer implements CompletionHandler<Integer, Attachment> {
       try {
         attach.channel.close();
         System.out.format("\u001B[35m" + "Stopped listening to the client %s%n" + "\u001B[0m",
-            attach.clientAddr);
+                          attach.clientAddr);
+        System.out.format("\u001B[35m" + "With id %s%n" + "\u001B[0m",
+                          attach.id);
       } catch (IOException ex) {
         ex.printStackTrace();
       }
