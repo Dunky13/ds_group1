@@ -37,11 +37,11 @@ public class ServerExecutor {
 	}
 	
 	public void sendMessageToMany(Message msg) {
-		serverSendReceive.sendMessageToMany(msg);
+		serverSendReceive.sendToAll(msg);
 	}
 
 	public void sendMessageToOne(ServerAndPorts sp, Message msg) {
-		serverSendReceive.sendMessageToOne(sp, msg);
+		serverSendReceive.sendToOne(sp, msg);
 	}
 	
 	public void receiveMessage(Message msg) {
