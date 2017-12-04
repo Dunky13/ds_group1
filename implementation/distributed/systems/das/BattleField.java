@@ -1,12 +1,14 @@
 package distributed.systems.das;
 
 import java.util.ArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import distributed.systems.das.units.Dragon;
 import distributed.systems.das.units.Player;
 import distributed.systems.das.units.Unit;
 import distributed.systems.das.units.extra.Bound;
 import distributed.systems.das.units.extra.UnitType;
+import distributed.systems.executors.ServerExecutor;
 import distributed.systems.core.IMessageReceivedHandler;
 import distributed.systems.core.Message;
 import distributed.systems.core.ServerClock;
@@ -48,25 +50,32 @@ public class BattleField implements IMessageReceivedHandler {
 	private ArrayList <Unit> units; 
 	TomProcedure tom;
 	ServerClock LC;
+	public LinkedBlockingQueue<Message> srvMsgQueue;
 	/**
 	 * Initialize the battlefield to the specified size 
 	 * @param width of the battlefield
 	 * @param height of the battlefield
 	 */
 	private BattleField(int width, int height) {
-		Socket local = new LocalSocket();//??? -> Is this tom now?
+//		Socket local = new LocalSocket();//??? -> Is this tom now?
 		
 		synchronized (this) {
 			map = new Unit[width][height];
-			local.register(BattleField.serverID);
-			serverSocket = new SynchronizedSocket(local);
-			serverSocket.addMessageReceivedHandler(this);
+//			local.register(BattleField.serverID);
+//			serverSocket = new SynchronizedSocket(local);
+//			serverSocket.addMessageReceivedHandler(this);
 			units = new ArrayList<Unit>();
 			//add server is to new
 			LC = new ServerClock();
-			tom = new TomProcedure("1",LC);
+//			tom = new TomProcedure("1",LC);
 			
 		}
+		
+	}
+	
+	public void init(ServerExecutor se) {
+		this.serverSocket = se.getSocket();
+		this.tom = new TomProcedure(se.getID(), LC);
 		
 	}
 
@@ -202,10 +211,17 @@ public class BattleField implements IMessageReceivedHandler {
 	}
 
 	public void onMessageReceived(Message msg) {
+		//Needs work
 		tom.submitMsgToTOM(msg);
 	}
 	
+	public void receivedClientMessage(Message msg) {
+		//this.rcvMsgQueue = msg
+	}
 	
+	public void receivedServerMessage(Message msg) {
+		srvMsgQueue.add(msg);	
+	}
 	
 	public void processTomMessages() {
 		if (tom.isMessageAvailable()) {

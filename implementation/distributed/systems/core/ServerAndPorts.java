@@ -7,14 +7,23 @@ public class ServerAndPorts {
 	private int receiver_port;
 	private int multicast_port;
 	private int publish_port;
+	private int id;
 
-	ServerAndPorts(String hostname, int tom_port, int receiver_port, int multicast_port, int publish_port) {
+	ServerAndPorts(int id, String hostname, int tom_port, int receiver_port, int multicast_port, int publish_port) {
+		this.id = id;
 		this.hostname = hostname;
 		this.tom_port = tom_port;
 		this.receiver_port = receiver_port;
 		this.multicast_port = multicast_port;
 		this.publish_port = publish_port;
 		
+	}
+
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
 	}
 
 	/**
@@ -50,6 +59,22 @@ public class ServerAndPorts {
 	 */
 	public int getPublish_port() {
 		return publish_port;
+	}
+	
+	public int getServerToServerReceivePort() {
+		return publish_port;
+	}
+	
+	public int getServerToServerSendPort() {
+		return multicast_port;
+	}
+	
+	public int getServerToClientPort() {
+		return receiver_port;
+	}
+	
+	public int getClientToServerPort() {
+		return tom_port;
 	}
 
 }

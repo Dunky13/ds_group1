@@ -45,7 +45,7 @@ public class TomProcedure{
 	private final int timeout = 1000;
 	Logger logger;
 	ServerClock LC;
-	SenderThread ST;
+	Thread ST;
 	ReceiverThread RT;
 	ProposedTimestamps PT;
 	private String localServerId;
@@ -63,27 +63,31 @@ public class TomProcedure{
 	
 	//4) Queue for the thread pool that processes all incoming messages
 	//Differentiation is done based on message type
-	public LinkedBlockingQueue<Message> receivedMsgQueue;
+	public LinkedBlockingQueue<Message> srvMsgQueue;
 		
 	
 	//Default Constructor
-	public TomProcedure(String serverId, ServerClock inLC){
+	public TomProcedure(String serverId, ServerClock inLC, LinkedBlockingQueue<Message> inRecvMsgs){
 		processQueue = new LinkedBlockingQueue<Message>();
 		unDeliverablesQueue = new  LinkedBlockingQueue<Message>();
 		LCpriority lcPriority = new LCpriority();
 		executionQueue = new PriorityBlockingQueue<Message>(1000,lcPriority);
 		service = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+		srvMsgQueue = inRecvMsgs; // Use it in receiveThread
 		logger = new Logger();
 		localServerId = serverId;
 		LC = inLC;
 		PT = new ProposedTimestamps();
-		ST = new SenderThread(processQueue,unDeliverablesQueue,LC,PT);
+		ST = new Thread(new SenderThread(processQueue,unDeliverablesQueue,LC,PT));
+		ST.start();
+		
+		
 		//service.submit(new ReceiverThread(executionQueue, unDeliverablesQueue,receivedMsgQueue,LC,PT));
 	}
 	
 	//QUEUE METHODS
 	/**
-	 * Message submition to TOM proc is decoupled from the process itself.
+	 * Message submission to TOM proc is decoupled from the process itself.
 	 * Fire-and-forget style.
 	 * @param msg
 	 * @param LC
@@ -123,15 +127,16 @@ public class TomProcedure{
 	
 	
 	/**
-	 * To be called by threads in the receiver thread pool
+	 * To be called by threads in the receiver thread pool.
+	 * May not be used!
 	 * @return
 	 */
-	public Message deQueueMsgForThreadPool() {
-		Message rtnMsg;
-		rtnMsg = receivedMsgQueue.remove();
-		logger.logMessage(rtnMsg);
-		return rtnMsg;
-	}
+//	public Message deQueueMsgForThreadPool() {
+//		Message rtnMsg;
+//		//rtnMsg = receivedMsgQueue.remove();
+//		logger.logMessage(rtnMsg);
+//		return rtnMsg;
+//	}
 	
 	
 	/**

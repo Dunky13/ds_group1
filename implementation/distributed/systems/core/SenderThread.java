@@ -14,7 +14,7 @@ public class SenderThread implements Runnable
 	private ProposedTimestamps proposedTimestamps;
 	private Message msg;
 	
-	public SenderThread(BlockingQueue<Message> processQ, BlockingQueue<Message> undeliverableQ, ServerClock inLC,ProposedTimestamps inPt)
+	public SenderThread(BlockingQueue<Message> processQ, BlockingQueue<Message> undeliverableQ, ServerClock inLC, ProposedTimestamps inPt)
 	{
 		processQueue = processQ;
 		unDeliverablesQueue = undeliverableQ;
@@ -36,10 +36,10 @@ public class SenderThread implements Runnable
 			}
 		
 			// Send msg to other server
-			msg.put("LC", LC.getClockValue());
+			//msg.put("LC", LC.getClockValue()); already done in submitMsgToTom
 			sendMessageToOtherServers(msg, Constants.ORIGINAL_MSG);
 		
-			// move message from processQueue to Undeliverables Queue
+			// move message from processQueue to Undeliverables Queue on local srv
 			moveLocalMsgToUndeliverables(msg);
 		
 			// spin on boolean value in proposedTimestamps or ad timeout value for fault-tolerance
@@ -68,8 +68,9 @@ public class SenderThread implements Runnable
 	
 	
 	private void sendMessageToOtherServers(Message msg, int type) {
-		msg.put("type", type);
-		//TO-DO: Multicast	
+		msg.put("type", type); //type 1 for originator messages.
+		//TO-DO: Multicast
+		
 		
 	}
 	

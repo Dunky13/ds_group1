@@ -76,8 +76,11 @@ public class ReceiverThread implements Runnable
 	 */
 	public void sendLocalLcToOriginator(Message msg){
 		int outgoingServerId = (Integer) msg.get("serverID");
+		ServerAndPorts sp = Constants.SERVER_PORT[outgoingServerId];
+		int localLC = LC.getClockValue();
 		//ADD 1 to 1 communication code here towards outgoingServerId
-		//...	
+		//...		
+		
 	}
 	
 	
@@ -89,9 +92,7 @@ public class ReceiverThread implements Runnable
 	public void procProposedLcMsg(Message msg) {
 		int serverID = (Integer) msg.get("serverID");
 		int proposedLC = (Integer) msg.get("proposedLC");
-		
 		proposedTimestamps.setLocalClock(serverID, proposedLC);
-		
 	}
 	
 	/**
@@ -114,13 +115,14 @@ public class ReceiverThread implements Runnable
 				break;
 			}
 		}
-		msg.put("LC",msg.get("MaxLC"));
+		//Remove from undeliverables
+		msg.put("LC",msg.get("MaxLC")); //Replace LC with maxLC
 		msg.removeMsgKeyVal("type");
 		msg.removeMsgKeyVal("MaxLC");
 		msg.removeMsgKeyVal("serverID");
 		msg.removeMsgKeyVal("proposedLC");
-		executableQueue.add(msg);
-		
+		msg.put("isDeliverable", 1);
+		executableQueue.add(msg); //Insert into execution Q
 	}
 	
 	
