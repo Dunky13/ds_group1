@@ -13,7 +13,6 @@ import java.util.ArrayList;
 
 
 public class ServerAndClientAsync {
-  //  public static volatile String spinValue  = "";
   private static final int[] ports = {8989, 8990, 8991, 8992, 8993};
   private static ArrayList<Attachment> serverList = new ArrayList<Attachment>();
   private static ArrayList<Integer> aliveServers = new ArrayList<Integer>();
@@ -33,7 +32,7 @@ public class ServerAndClientAsync {
           System.out.format("\u001B[35m" + "sdfvfvdf Accepted a  connection from  %s%n" + "\u001B[0m", clientAddr);
           Attachment attach = new Attachment();
           attach.channel = channel;
-          //attach.id = port;
+          attach.id = port; // change this to port
           System.out.println("The id: "+attach.id);
           serverList.add(attach);
           aliveServers.add(port);
@@ -46,43 +45,6 @@ public class ServerAndClientAsync {
       } catch (Exception e) {
       }      
     }    
-  }
-
-  
-  private static void spawnClient(int port) {
-    while(true) {
-      try {
-        System.out.println("Dio porco in the spawn client");
-        AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
-        String msg = "First connection message";
-        SocketAddress serverAddr = new InetSocketAddress("localhost", port);
-        Future<Void> result = channel.connect(serverAddr);
-        result.get();
-        System.out.println("Connected");
-        Attachment attach = new Attachment();
-        attach.channel = channel;
-        attach.buffer = ByteBuffer.allocate(2048);
-        attach.isRead = false;
-        // attach.mainThread = Thread.currentThread();
-        Charset cs = Charset.forName("UTF-8");
-        // String msg = "Hello";
-        byte[] data = msg.getBytes(cs);
-        attach.buffer.put(data);
-        attach.buffer.flip();
-        ReadWriteHandlerClient readWriteHandler = new ReadWriteHandlerClient();
-        channel.write(attach.buffer, attach, readWriteHandler);
-        attach.mainThread = Thread.currentThread();
-        attach.mainThread.join();
-      } catch(Exception e) {
-        //System.out.println("Server on port "+port+ " not found .. retrying");
-        try {
-          // sleeping before trying again
-          Thread.currentThread().sleep(4000);
-        } catch (InterruptedException iex) {
-          
-        }
-      }
-    }
   }
 
   private static void spawnServer(int p) throws Exception {
@@ -98,26 +60,54 @@ public class ServerAndClientAsync {
     Thread.currentThread().join();
   }
 
-  // This method will be called with a thred assigned to it whenever a new game move is issued.
-  private static void modifySharedVairable() {
-    while (true) {
-      System.out.print("\u001B[32m" + "enter a string in the shared variable: " + "\u001B[0m");
-      try {
-        String msg = (new BufferedReader(new InputStreamReader(System.in))).readLine();
-        //spinValue = msg;
+  // Send a message to all the others servers
+  private static void sendToAll(String msg) {      
+      try {        
         for (Attachment attach : serverList) {
           attach.buffer = ByteBuffer.allocate(2048);
           attach.isRead = false;
-          // attach.mainThread = Thread.currentThread();
           Charset cs = Charset.forName("UTF-8");
-          // String msg = "Hello";
           byte[] data = msg.getBytes(cs);
           attach.buffer.put(data);
           attach.buffer.flip();
           ReadWriteHandlerClient readWriteHandler = new ReadWriteHandlerClient();
           attach.channel.write(attach.buffer, attach, readWriteHandler);
-          //          channel.write(attach.buffer, attach, readWriteHandler);
         }
+      } catch (Exception e) {
+      }
+  }
+
+  // Send a message to a specific server identified with a port
+  private static void sendToOne(String msg, int port) {      
+    try {        
+      for (Attachment attach : serverList) {
+        if (attach.id == port) {
+          attach.buffer = ByteBuffer.allocate(2048);
+          attach.isRead = false;
+          Charset cs = Charset.forName("UTF-8");
+          byte[] data = msg.getBytes(cs);
+          attach.buffer.put(data);
+          attach.buffer.flip();
+          ReadWriteHandlerClient readWriteHandler = new ReadWriteHandlerClient();
+          attach.channel.write(attach.buffer, attach, readWriteHandler);
+        }
+      }
+    } catch (Exception e) {
+    }
+  }
+
+  private static void askForInput() {
+    while (true) {
+      try {
+      System.out.print("\u001B[32m" + "enter a message: " + "\u001B[0m");
+      String msg = (new BufferedReader(new InputStreamReader(System.in))).readLine();
+      System.out.print("\u001B[32m" + "enter 0 for send to All, port number otherwise: " + "\u001B[0m");
+      int port = Integer.parseInt((new BufferedReader(new InputStreamReader(System.in))).readLine());
+      if (port == 0) {
+        sendToAll(msg);
+      } else {
+        sendToOne(msg, port);
+      }
       } catch (Exception e) {
       }
     }
@@ -129,21 +119,16 @@ public class ServerAndClientAsync {
       System.out.println("missing server port argument");
       System.exit(1);
     }
-    // Binding a thread to each server
-    // for (int i : ports) {
-    //   if (i != Integer.parseInt(args[0])) {
-    //     new Thread(() -> {
-    //         spawnClient(i);
-    //     }).start();
-    //   }
-    // }
+    
     new Thread(() -> {
         findServers(Integer.parseInt(args[0]));
     }).start();
-    // ask user for share variable update value
+
     new Thread(() -> {
-        modifySharedVairable();
+        askForInput();
     }).start();
+    
+    
     // spawining the actual server
     spawnServer(Integer.parseInt(args[0]));    
   }
@@ -206,7 +191,6 @@ class ReadWriteHandlerServer implements CompletionHandler<Integer, Attachment> {
       attach.isRead = false; // to rm
       attach.buffer.rewind();      
       // Mirror: send back the received message to client
-      // TODO here change the volatile common value
       attach.channel.write(attach.buffer, attach, this);
       attach.isRead = true;
       attach.buffer.clear();
@@ -234,28 +218,6 @@ class ReadWriteHandlerClient implements CompletionHandler<Integer, Attachment> {
       String msg = new String(bytes, cs);
       //int port = 0;
       System.out.println("\u001B[33m" + "Server Responded: "+ msg + "" + "\u001B[0m");
-      try {
-        // ask the user for another message to send to server
-        //msg = this.getTextFromUser();
-        //port = this.getPortFromUser();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-      // if (msg.equalsIgnoreCase("bye")) {
-      //   attach.mainThread.interrupt();
-      //   return;
-      // }
-      // String prevValue = ServerAndClientAsync.spinValue;
-      // while (prevValue.equals(ServerAndClientAsync.spinValue)) {
-      //   // busy wait
-      // }
-      // msg = ServerAndClientAsync.spinValue;
-      // attach.buffer.clear();
-      // byte[] data = msg.getBytes(cs);
-      // attach.buffer.put(data);
-      // attach.buffer.flip();
-      // attach.isRead = false; // It is a write
-      // attach.channel.write(attach.buffer, attach, this);
     } else {
       attach.isRead = true;
       attach.buffer.clear();
@@ -265,15 +227,5 @@ class ReadWriteHandlerClient implements CompletionHandler<Integer, Attachment> {
   @Override
   public void failed(Throwable e, Attachment attach) {
     e.printStackTrace();
-  }
-  private String getTextFromUser() throws Exception {
-    System.out.print("\u001B[33m" + "Please enter a  message  (Bye  to quit): " + "\u001B[0m");
-    BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
-    String msg = consoleReader.readLine();
-    return msg;
-  }
-  private int getPortFromUser() throws Exception {
-    System.out.print("\u001B[33m" + "Please enter a  port to send the message to: " + "\u001B[0m");
-    return Integer.parseInt((new BufferedReader(new InputStreamReader(System.in))).readLine());
   }
 }
