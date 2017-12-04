@@ -63,7 +63,10 @@ public class Logger {
 	
 	
 	public void close() throws InterruptedException {
+		toPrint.notifyAll();
 		logRunning = false;
+		logThread.notifyAll();
+		logThread.interrupt();
 		logThread.join();
 	}
 	
