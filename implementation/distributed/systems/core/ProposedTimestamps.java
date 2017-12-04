@@ -1,5 +1,7 @@
 package distributed.systems.core;
 
+import distributed.systems.core.Constants;
+
 public class ProposedTimestamps {
 
 	public volatile boolean receivedAllClocks;
@@ -7,7 +9,7 @@ public class ProposedTimestamps {
 	
 	public ProposedTimestamps() {
 		receivedAllClocks = false;
-		localClocks = new int[5]; // ideally a constant 
+		localClocks = new int[Constants.NUMBER_OF_SERVERS]; // ideally a constant 
 		initLocalClocks();
 	}
 	

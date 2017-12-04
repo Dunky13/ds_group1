@@ -68,7 +68,7 @@ public class Logger {
 	 * @param msg
 	 */
 	public void logMessage(Message msg) {
-		Iterator entries = msg.getIterator();
+		Iterator<?> entries = msg.getIterator();
 		logText("[M] Message printing");
 		while(entries.hasNext()) {
 		    Map.Entry entry = (Map.Entry) entries.next();

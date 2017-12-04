@@ -1,7 +1,7 @@
 package distributed.systems.core;
 
 import distributed.systems.das.BattleField;
-import distributed.systems.das.units.Unit;;
+import distributed.systems.das.units.Unit;
 
 
 public class Socket {

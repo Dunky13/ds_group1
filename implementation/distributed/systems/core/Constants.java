@@ -4,6 +4,8 @@ public final class Constants{
 	
 	public static final String HOSTNAME="localhost";
 	
+	public static final int NUMBER_OF_SERVERS = 5;
+	
 	public static int[] TOM_PORTS = {2000,2001,2002,2003,2004};
 	
 	public static int[] RECEIVER_PORTS = {3000,3001,3002,3003,3004};

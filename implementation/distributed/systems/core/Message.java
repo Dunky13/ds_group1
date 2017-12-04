@@ -1,6 +1,7 @@
 package distributed.systems.core;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.io.Serializable;
 
 import distributed.systems.das.units.Unit;
@@ -39,7 +40,7 @@ public class Message implements Serializable {
 	}
 	
 		
-	public Iterator getIterator() {
+	public Iterator<?> getIterator() {
 		return contents.entrySet().iterator();
 	}
 

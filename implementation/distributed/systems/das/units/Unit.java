@@ -230,13 +230,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler {
 		spawnMessage.put("unit", this);
 		spawnMessage.put("id", id);
 
-		// Send a spawn message
-		try {
-			clientSocket.sendMessage(spawnMessage, "localsocket://" + BattleField.serverID);
-		} catch (IDNotAssignedException e) {
-			System.err.println("No server found while spawning unit at location (" + x + ", " + y + ")");
-			return false;
-		}
+		clientSocket.sendMessage(spawnMessage, "localsocket://" + BattleField.serverID);
 
 		// Wait for the unit to be placed
 		getUnit(x, y);
