@@ -9,6 +9,9 @@ import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.charset.Charset;
 import java.util.concurrent.Future;
+
+import distributed.systems.executors.ServerExecutor;
+
 import java.util.ArrayList;
 
 
@@ -17,8 +20,17 @@ public class ServerSendReceive {
 	private static final int[] ports = {8989, 8990, 8991, 8992, 8993};
 	private static ArrayList<Attachment> serverList = new ArrayList<Attachment>();
 	private static ArrayList<Integer> aliveServers = new ArrayList<Integer>();
+	private ServerExecutor se;
 
 
+	public ServerSendReceive(ServerExecutor se) {
+		this.se = se;
+	}
+	
+	public void receivedMessage() {
+		se.receiveMessage(null);
+	}
+	
 	private static void findServers(int myport) {
 		while(true) {
 			try {
