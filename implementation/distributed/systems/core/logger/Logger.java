@@ -1,8 +1,11 @@
 package distributed.systems.core.logger;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import distributed.systems.core.Message;
 
@@ -13,6 +16,10 @@ public class Logger {
 	private String logFolderName;
 	private String fullFilePath;
 	
+	private BlockingQueue<ArrayList<String>> toPrint;
+	private Thread logThread;
+	private boolean logRunning;
+	
 	public Logger() {
 		//IMPORTANT: Change the paths to the log file!
 		String remove ="file:";
@@ -21,6 +28,43 @@ public class Logger {
 		logFolderName += "logger/Logs"; //Change "logger" to package path
 		logFolderName = logFolderName.replace(remove, "");
 		fullFilePath= logFolderName + "/" + filename;
+		logRunning = true;
+		logThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					File logfile = new File(fullFilePath);
+					FileWriter fw = new FileWriter(logfile,true);
+					BufferedWriter bw = new BufferedWriter(fw);
+					ArrayList<String> texts;
+					while(logRunning) {
+						try {
+							texts = toPrint.take();
+							for(String text: texts) {
+								bw.write(text);
+								bw.newLine();
+							}
+							bw.flush();
+						} catch (InterruptedException e) {
+						}
+						catch(IOException e) {
+							
+						}
+						
+					}
+					bw.close();
+				}catch(IOException e) {
+					e.printStackTrace();
+				}	
+			}
+		});
+		logThread.start();
+	}
+	
+	
+	public void close() throws InterruptedException {
+		logRunning = false;
+		logThread.join();
 	}
 	
 	
@@ -49,18 +93,9 @@ public class Logger {
 	 * Connected to server x, etc..
 	 * @param text 
 	 */
-	public void logText(String text) {
-		try {
-			File logfile = new File(fullFilePath);
-			FileWriter fw = new FileWriter(logfile,true);
-			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(text);
-			bw.newLine();
-			bw.close();
-		}catch(IOException e) {
-			e.printStackTrace();
-		}	
-	}
+//	public void logText(String text) {
+//		
+//	}
 	
 	
 	/**
@@ -69,14 +104,16 @@ public class Logger {
 	 */
 	public void logMessage(Message msg) {
 		Iterator<?> entries = msg.getIterator();
-		logText("[M] Message printing");
+		ArrayList<String> texts = new ArrayList<String>();
+		texts.add("[M] Message printing");
 		while(entries.hasNext()) {
 		    Map.Entry entry = (Map.Entry) entries.next();
 		    String key = entry.getKey().toString();
 		    String value = entry.getValue().toString();
-			logText("Key = " + key + ",  Value = " + value );
+		    texts.add("Key = " + key + ",  Value = " + value );
 		}
-		logText("[M] End of Message printing");	
+		texts.add("[M] End of Message printing");	
+		toPrint.add(texts);
 	}
 	
 	
@@ -91,10 +128,11 @@ public class Logger {
 	 * @param action
 	 */
 	public void logActionEvent(int unitId, int x, int y , int target_x, int target_y, String action) {
-		logText("[AE] Action Event printing");
-		logText("Unit with id = " + unitId + " at location [" + x + "],[" + y + "] executed action: " + action + " on target located at ["+target_x+"],["+target_y+"].");
-		logText("[AE] End of Action Event printing");
-		
+		ArrayList<String> texts = new ArrayList<String>();
+		texts.add("[AE] Action Event printing");
+		texts.add("Unit with id = " + unitId + " at location [" + x + "],[" + y + "] executed action: " + action + " on target located at ["+target_x+"],["+target_y+"].");
+		texts.add("[AE] End of Action Event printing");
+		toPrint.add(texts);
 	}
 	
 	/**
@@ -105,9 +143,11 @@ public class Logger {
 	 * @param event
 	 */
 	public void logOtherEvent(int unitId, int x, int y, String event) {
-		logText("[OE] Other Event printing");
-		logText ("Unit with id = " + unitId + " " + event + " at/from location[" + x + "],[" + y + "] ");
-		logText("[OE] End of Other Event printing");
+		ArrayList<String> texts = new ArrayList<String>();
+		texts.add("[OE] Other Event printing");
+		texts.add ("Unit with id = " + unitId + " " + event + " at/from location[" + x + "],[" + y + "] ");
+		texts.add("[OE] End of Other Event printing");
+		toPrint.add(texts);
 	}
 	
 	

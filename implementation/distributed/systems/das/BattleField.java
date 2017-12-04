@@ -309,7 +309,7 @@ public class BattleField implements IMessageReceivedHandler {
 			unit.disconnect();
 			unit.stopRunnerThread();
 		}
-
+		this.tom.close();
 		serverSocket.unRegister();
 	}
 	
