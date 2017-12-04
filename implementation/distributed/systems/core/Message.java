@@ -8,9 +8,8 @@ import distributed.systems.das.units.Unit;
 
 
 public class Message implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
-	
+
+	private static final long serialVersionUID = -2791452299144895125L;
 	HashMap<String,Serializable> contents;
 	
 	public Message(){

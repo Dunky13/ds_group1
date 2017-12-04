@@ -15,11 +15,11 @@ public final class Constants{
 	public static int[] PUBLISH_PORTS = {5000,5001,5002,5003,5004};
 	
 	public static ServerAndPorts[] SERVER_PORT = {
-			new ServerAndPorts(Constants.HOSTNAME, 2000, 3000, 4000, 5000),
-			new ServerAndPorts(Constants.HOSTNAME, 2001, 3001, 4001, 5001),
-			new ServerAndPorts(Constants.HOSTNAME, 2002, 3002, 4002, 5002),
-			new ServerAndPorts(Constants.HOSTNAME, 2003, 3003, 4003, 5003),
-			new ServerAndPorts(Constants.HOSTNAME, 2004, 3004, 4004, 5004),
+			new ServerAndPorts(0, Constants.HOSTNAME, 2000, 3000, 4000, 5000),
+			new ServerAndPorts(1, Constants.HOSTNAME, 2001, 3001, 4001, 5001),
+			new ServerAndPorts(2, Constants.HOSTNAME, 2002, 3002, 4002, 5002),
+			new ServerAndPorts(3, Constants.HOSTNAME, 2003, 3003, 4003, 5003),
+			new ServerAndPorts(4, Constants.HOSTNAME, 2004, 3004, 4004, 5004),
 	};
 	
 	public static final int ORIGINAL_MSG = 1;
