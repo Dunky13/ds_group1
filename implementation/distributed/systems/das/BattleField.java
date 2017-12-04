@@ -54,7 +54,7 @@ public class BattleField implements IMessageReceivedHandler {
 	 * @param height of the battlefield
 	 */
 	private BattleField(int width, int height) {
-		Socket local = new LocalSocket();//???
+		Socket local = new LocalSocket();//??? -> Is this tom now?
 		
 		synchronized (this) {
 			map = new Unit[width][height];

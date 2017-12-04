@@ -48,7 +48,6 @@ public class TomProcedure{
 	SenderThread ST;
 	ReceiverThread RT;
 	ProposedTimestamps PT;
-	private String[][] listOfServersAndPorts;
 	private String localServerId;
 	private ExecutorService service;
 	private final int THREAD_POOL_SIZE = 10; //just an arbitrary number so far
