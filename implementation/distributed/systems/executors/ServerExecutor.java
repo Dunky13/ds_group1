@@ -37,15 +37,14 @@ public class ServerExecutor {
 	}
 	
 	public void sendMessageToMany(Message msg) {
-		
+		serverSendReceive.sendMessageToMany(msg);
 	}
 
-	public void sendMessageToOne(Message msg) {
-		serverSendReceive.sendMessageToOne(msg);
+	public void sendMessageToOne(ServerAndPorts sp, Message msg) {
+		serverSendReceive.sendMessageToOne(sp, msg);
 	}
 	
 	public void receiveMessage(Message msg) {
-		// put in rcvMsgQueue
 		b.receivedClientMessage(msg);
 	}
 	

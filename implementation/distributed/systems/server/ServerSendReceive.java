@@ -10,6 +10,9 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.charset.Charset;
 import java.util.concurrent.Future;
 
+import distributed.systems.core.Constants;
+import distributed.systems.core.Message;
+import distributed.systems.core.ServerAndPorts;
 import distributed.systems.executors.ServerExecutor;
 
 import java.util.ArrayList;
@@ -158,5 +161,16 @@ public class ServerSendReceive {
 		}).start();
 		// spawining the actual server
 		spawnServer(Integer.parseInt(args[0]));    
+	}
+
+	public void sendMessageToOne(ServerAndPorts sp, Message msg) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sendMessageToMany(Message msg) {
+//		Constants.SERVER_PORT;
+		// TODO Auto-generated method stub
+		
 	}
 }
