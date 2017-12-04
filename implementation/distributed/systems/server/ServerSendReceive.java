@@ -17,8 +17,6 @@ import distributed.systems.core.ServerAndPorts;
 import distributed.systems.executors.ServerExecutor;
 
 
-
-
 public class ServerSendReceive {
   private static final int[] ports = {8989, 8990, 8991, 8992, 8993};
   private static ArrayList<Attachment> serverList = new ArrayList<Attachment>();
@@ -76,7 +74,7 @@ public class ServerSendReceive {
   }
 
   // Send a message to all the others servers
-  private static void sendToAll(String msg) {      
+  public static void sendToAll(String msg) {      
       try {        
         for (Attachment attach : serverList) {
           attach.buffer = ByteBuffer.allocate(2048);
@@ -93,7 +91,7 @@ public class ServerSendReceive {
   }
 
   // Send a message to a specific server identified with a port
-  private static void sendToOne(String msg, int port) {      
+  public static void sendToOne(String msg, int port) {      
     try {        
       for (Attachment attach : serverList) {
         if (attach.id == port) {
@@ -147,17 +145,6 @@ public class ServerSendReceive {
     
     // spawining the actual server
     spawnServer(Integer.parseInt(args[0]));    
-  }
-  
-  public void sendMessageToOne(ServerAndPorts sp, Message msg) {
-    // TODO Auto-generated method stub
-		
-  }
-
-  public void sendMessageToMany(Message msg) {
-    //		Constants.SERVER_PORT;
-    // TODO Auto-generated method stub
-		
   }
 }
 
