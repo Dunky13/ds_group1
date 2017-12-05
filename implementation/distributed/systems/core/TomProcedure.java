@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import distributed.systems.core.logger.Logger;
+import distributed.systems.das.GameState;
 import distributed.systems.executors.ServerExecutor;
 
 //Types of messages wrt to threads
@@ -73,7 +74,7 @@ public class TomProcedure
 		localServerId = se.getServerPortData().getID() + "";
 		LC = inLC;
 		PT = new ProposedTimestamps();
-		
+		//if (GameState.getAmIaLogger())logger.logText("Dragons connected, Initializing players...");
 		
 		tomSenderThread = new Thread(new SenderThread(se,processQueue, unDeliverablesQueue, executionQueue, LC, PT));
 		tomSenderThread.start();

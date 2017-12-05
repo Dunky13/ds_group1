@@ -20,7 +20,7 @@ public class ServerExecutor
 	public static BattleField battlefield; 
 	public static int playerCount;
 	public static Logger logger;
-
+	static String testpath; //= getClass().getProtectionDomain().getCodeSource().getLocation().toString();
 	private ServerAndPorts sp;
 	private ServerSendReceive serverSendReceive;
 	//private BattleField b;
@@ -30,27 +30,33 @@ public class ServerExecutor
 		sp = Constants.SERVER_PORT[serverID];
 		battlefield = BattleField.getBattleField();
 		battlefield.init(this);
+		System.out.println("b4 serverSendReceive");
 		serverSendReceive = new ServerSendReceive(this);
+		System.out.println("after serverSendReceive");
 		logger = new Logger();
+		testpath = getClass().getProtectionDomain().getCodeSource().getLocation().toString();
 		if (serverID == 0 || serverID == 1)
 		{
 			GameState.setAmIaLoger(true);
 			logger.logText("I am a logger server (id:" + serverID + ")");
+			System.out.println("I am a logger!");
 		}
 	}
 
 	public static void main(String[] args)
 	{
+		System.out.println("Reading command line arguements");
 		if (args.length != 1)
 		{
 			System.out.println("missing serverID argument");
 			System.exit(1);
 		}
 		ServerExecutor se = new ServerExecutor(Integer.parseInt(args[0]));
-		
+		System.out.println(testpath);
 		//battlefield = BattleField.getBattleField();
 		if (GameState.getAmIaLogger())logger.createLogFile();
 		if (GameState.getAmIaLogger())logger.logText("Game started!");
+		System.out.println("Game started!");
 		/* All the dragons connect */
 		for(int i = 0; i < DRAGON_COUNT; i++) {
 			/* Try picking a random spot */
@@ -109,6 +115,7 @@ public class ServerExecutor
 			}).start();
 			
 		}
+		System.out.println("All players initialized. Starting viewer...");
 		if (GameState.getAmIaLogger())logger.logText("All players initialized. Starting viewer...");
 		/* Spawn a new battlefield viewer */
 		new Thread(new Runnable() {
