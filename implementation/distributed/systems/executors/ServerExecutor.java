@@ -30,32 +30,32 @@ public class ServerExecutor
 		sp = Constants.SERVER_PORT[serverID];
 		battlefield = BattleField.getBattleField();
 		battlefield.init(this);
-		System.out.println("b4 serverSendReceive");
+		//System.out.println("b4 serverSendReceive");
 		serverSendReceive = new ServerSendReceive(this);
-		System.out.println("after serverSendReceive");
-		logger = new Logger();
-		logger.createLogFile();
+		//System.out.println("after serverSendReceive");
 		testpath = getClass().getProtectionDomain().getCodeSource().getLocation().toString();
 		if (serverID == 0 || serverID == 1)
 		{
 			GameState.setAmIaLoger(true);
-			logger.logText("I am a logger server (id:" + serverID + ")");
+			//logger.logText("I am a logger server (id:" + serverID + ")");
 			System.out.println("I am a logger!");
 		}
+		if (GameState.getAmIaLogger()) logger = new Logger(serverID);
+		if (GameState.getAmIaLogger()) logger.createLogFile();
 	}
 
 	public static void main(String[] args)
 	{
-		System.out.println("Reading command line arguements");
+		System.out.println("Reading command line arguments");
 		if (args.length != 1)
 		{
 			System.out.println("missing serverID argument");
 			System.exit(1);
 		}
 		ServerExecutor se = new ServerExecutor(Integer.parseInt(args[0]));
-		System.out.println(testpath);
+		//System.out.println(testpath);
 		//battlefield = BattleField.getBattleField();
-		if (GameState.getAmIaLogger())logger.createLogFile();
+		//if (GameState.getAmIaLogger())logger.createLogFile();
 		if (GameState.getAmIaLogger())logger.logText("Game started!");
 		System.out.println("Game started!");
 		/* All the dragons connect */

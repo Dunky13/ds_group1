@@ -233,6 +233,7 @@ public class BattleField implements IMessageReceivedHandler
 
 	public void receivedClientMessage(Message msg)
 	{
+		System.out.println("receivedClientMessage");
 		MessageRequest request = (MessageRequest)msg.get("request");
 		Message reply;
 		switch (request) {
@@ -274,6 +275,7 @@ public class BattleField implements IMessageReceivedHandler
 
 	public void receivedServerMessage(Message msg)
 	{
+		System.out.println("receivedServerMessage");
 		srvMsgQueue.add(msg);
 	}
 
@@ -378,7 +380,7 @@ public class BattleField implements IMessageReceivedHandler
 			unit.disconnect();
 			unit.stopRunnerThread();
 		}
-		this.tom.close();
+		//this.tom.close();
 	}
 
 	public ServerExecutor getServerExecutor()

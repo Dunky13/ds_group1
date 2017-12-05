@@ -12,11 +12,12 @@ public class Logger {
 	private String filename;
 	private String logFolderName;
 	private String fullFilePath;
+	private String serverId;
 	
-	public Logger() {
+	public Logger(int srvId) {
 		//IMPORTANT: Change the paths to the log file!
 		String remove ="file:";
-		filename="DAS_Game_log.txt";
+		filename="DAS_Game_log_srv"+srvId+".txt";
 		logFolderName =  getClass().getProtectionDomain().getCodeSource().getLocation().toString();
 		logFolderName += "distributed/systems/Logs"; //Change "logger" to package path
 		logFolderName = logFolderName.replace(remove, "");

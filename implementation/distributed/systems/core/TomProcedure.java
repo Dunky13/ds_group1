@@ -107,17 +107,17 @@ public class TomProcedure
 	{
 		//ST.run();
 	}
-
-	public void close()
-	{
-		try
-		{
-			this.logger.close();
-		}
-		catch (InterruptedException e)
-		{
-		}
-	}
+//
+//	public void close()
+//	{
+//		try
+//		{
+//			this.logger.close();
+//		}
+//		catch (InterruptedException e)
+//		{
+//		}
+//	}
 
 	/**
 	 * Receiver thread code
