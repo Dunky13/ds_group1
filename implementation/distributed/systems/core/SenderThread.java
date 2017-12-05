@@ -1,5 +1,6 @@
 package distributed.systems.core;
 
+import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 
 import distributed.systems.core.Message;
@@ -10,20 +11,22 @@ public class SenderThread implements Runnable
 {
 	private BlockingQueue<Message> processQueue;
 	private BlockingQueue<Message> unDeliverablesQueue;
+	private BlockingQueue<Message> executionQueue;
 	private ServerClock LC;
 	private ProposedTimestamps proposedTimestamps;
 	private Message msg;
 	
-	public SenderThread(BlockingQueue<Message> processQ, BlockingQueue<Message> undeliverableQ, ServerClock inLC, ProposedTimestamps inPt)
+	public SenderThread(BlockingQueue<Message> processQ, BlockingQueue<Message> undeliverableQ,  BlockingQueue<Message> executionQ, ServerClock inLC, ProposedTimestamps inPt)
 	{
 		processQueue = processQ;
 		unDeliverablesQueue = undeliverableQ;
+		executionQueue = executionQ;
 		LC = inLC;
 		proposedTimestamps=inPt;
 		msg = null;
 	}
 	
-
+	
 	
 	public void run( ) {
 		while(GameState.getRunningState()) {
@@ -51,6 +54,8 @@ public class SenderThread implements Runnable
 		
 			msg.put("maxLC", maxTimestamp);
 			sendMessageToOtherServers(msg, Constants.FINAL_TIMESTAMP_MSG);
+			Iterator iter = unDeliverablesQueue.iterator();
+			moveLocalMsgToExecutable(msg,iter);
 		}
 	}
 	
@@ -71,10 +76,29 @@ public class SenderThread implements Runnable
 		msg.put("type", type); //type 1 for originator messages.
 		//TO-DO: Multicast
 		
-		
+	}	
+	
+	public void moveLocalMsgToExecutable(Message msg, Iterator it) {
+		int msgId = (Integer)msg.get("id");
+		int maxLC = (Integer)msg.get("MaxLC");
+		for(Iterator i=it; it.hasNext();) {//untested
+			Message m = (Message) i.next();
+			if((Integer)m.get("id")==msgId) {
+				it.remove();
+				break;
+			}
+		}
+		//Remove from undeliverables
+		msg.put("LC",msg.get("MaxLC")); //Replace LC with maxLC
+		msg.removeMsgKeyVal("type");
+		msg.removeMsgKeyVal("MaxLC");
+		msg.removeMsgKeyVal("serverID");
+		msg.removeMsgKeyVal("proposedLC");
+		msg.put("isDeliverable", 1);
+		executionQueue.add(msg); //Insert into execution Q
 	}
 	
-	
+	/** Return 
 	
 	/**
 	 * Returns the maximum value from the provided input.

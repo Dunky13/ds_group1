@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 
 import distributed.systems.core.Message;
+import distributed.systems.das.GameState;
 
 
 public class ReceiverThread implements Runnable 
@@ -23,30 +24,32 @@ public class ReceiverThread implements Runnable
 		delIt = unDeliverablesQueue.iterator();
 		receivedMsgQueue = receivedMsgQ;
 		LC = inLC;
-		msg = null;
 		proposedTimestamps = inPt;
+		msg = null;
 	}
 	
 	
 	public void run()
 	{	
-		try {
-			msg = receivedMsgQueue.take();
-		} catch (InterruptedException e) {
+		while(GameState.getRunningState()) {
+			try {
+				msg = receivedMsgQueue.take();
+			} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		switch((Integer) msg.get("type"))
-		{
-			case Constants.ORIGINAL_MSG:
-				procOriginatorMsg(msg);
-				break;
-			case Constants.PROPOSED_TIMESTAMP_MSG:
-				procProposedLcMsg(msg);
-				break;
-			case Constants.FINAL_TIMESTAMP_MSG:
-				procMaxLcMsg(msg, delIt);
-				break;
+				e.printStackTrace();
+			}
+			switch((Integer) msg.get("type"))
+			{
+				case Constants.ORIGINAL_MSG:
+					procOriginatorMsg(msg);
+					break;
+				case Constants.PROPOSED_TIMESTAMP_MSG:
+					procProposedLcMsg(msg);
+					break;
+				case Constants.FINAL_TIMESTAMP_MSG:
+					procMaxLcMsg(msg, delIt);
+					break;
+			}
 		}
 	}
 	
@@ -63,7 +66,7 @@ public class ReceiverThread implements Runnable
 		if(origLc > localLc) LC.advanceClock(origLc); //compare and advance if needed
 		localLc = LC.getClockValue(); //get the new LC value
 		int originId = (Integer)msg.get("serverID");
-		msg.put("proposedLC", originId);
+		msg.put("proposedLC", localLc);
 		msg.put("type", 2); //turn into proposedLC type
 		unDeliverablesQueue.add(msg);
 		sendLocalLcToOriginator(msg);
@@ -124,7 +127,6 @@ public class ReceiverThread implements Runnable
 		msg.put("isDeliverable", 1);
 		executableQueue.add(msg); //Insert into execution Q
 	}
-	
 	
 
 	

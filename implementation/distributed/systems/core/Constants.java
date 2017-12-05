@@ -22,6 +22,7 @@ public final class Constants{
 			new ServerAndPorts(4, Constants.HOSTNAME, 2004, 3004, 4004, 5004),
 	};
 	
+	public static final int THREAD_POOL_SIZE = 10;
 	public static final int ORIGINAL_MSG = 1;
 	public static final int PROPOSED_TIMESTAMP_MSG = 2;
 	public static final int FINAL_TIMESTAMP_MSG = 3;	

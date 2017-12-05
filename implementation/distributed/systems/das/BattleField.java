@@ -2,42 +2,34 @@ package distributed.systems.das;
 
 import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
-
+import distributed.systems.core.IMessageReceivedHandler;
+import distributed.systems.core.Message;
+import distributed.systems.core.ServerClock;
+import distributed.systems.core.TomProcedure;
 import distributed.systems.das.units.Dragon;
 import distributed.systems.das.units.Player;
 import distributed.systems.das.units.Unit;
 import distributed.systems.das.units.extra.Bound;
 import distributed.systems.das.units.extra.UnitType;
 import distributed.systems.executors.ServerExecutor;
-import distributed.systems.core.IMessageReceivedHandler;
-import distributed.systems.core.Message;
-import distributed.systems.core.ServerClock;
-import distributed.systems.core.TomProcedure;
-import distributed.systems.core.Socket;
-import distributed.systems.core.SynchronizedSocket;
-import distributed.systems.core.exception.IDNotAssignedException;
-//import distributed.systems.example.LocalSocket;//????
 
 /**
- * The actual battlefield where the fighting takes place.
- * It consists of an array of a certain width and height.
+ * The actual battlefield where the fighting takes place. It consists of an
+ * array of a certain width and height.
  * 
- * It is a singleton, which can be requested by the 
- * getBattleField() method. A unit can be put onto the
- * battlefield by using the putUnit() method.
+ * It is a singleton, which can be requested by the getBattleField() method. A
+ * unit can be put onto the battlefield by using the putUnit() method.
  * 
  * @author Pieter Anemaet, Boaz Pat-El
  */
-public class BattleField implements IMessageReceivedHandler {
+public class BattleField implements IMessageReceivedHandler
+{
 	/* The array of units */
 	private Unit[][] map;
 
 	/* The static singleton */
 	private static BattleField battlefield;
 
-	/* Primary socket of the battlefield */ 
-	private Socket serverSocket;
-	
 	/* The last id that was assigned to an unit. This variable is used to
 	 * enforce that each unit has its own unique id.
 	 */
@@ -47,69 +39,79 @@ public class BattleField implements IMessageReceivedHandler {
 	public final static int MAP_WIDTH = 25;
 	public final static int MAP_HEIGHT = 25;
 	public final static Bound MAP_BOUND = new Bound(BattleField.MAP_WIDTH, BattleField.MAP_HEIGHT);
-	private ArrayList <Unit> units; 
+	private ArrayList<Unit> units;
 	TomProcedure tom;
 	ServerClock LC;
 	public LinkedBlockingQueue<Message> srvMsgQueue;
+
+	private ServerExecutor serverExecutor;
+
 	/**
-	 * Initialize the battlefield to the specified size 
-	 * @param width of the battlefield
-	 * @param height of the battlefield
+	 * Initialize the battlefield to the specified size
+	 * 
+	 * @param width
+	 *            of the battlefield
+	 * @param height
+	 *            of the battlefield
 	 */
-	private BattleField(int width, int height) {
-//		Socket local = new LocalSocket();//??? -> Is this tom now?
-		
-		synchronized (this) {
+	private BattleField(int width, int height)
+	{
+		//		Socket local = new LocalSocket();//??? -> Is this tom now?
+
+		synchronized (this)
+		{
 			map = new Unit[width][height];
-//			local.register(BattleField.serverID);
-//			serverSocket = new SynchronizedSocket(local);
-//			serverSocket.addMessageReceivedHandler(this);
+			//			local.register(BattleField.serverID);
+			//			serverSocket = new SynchronizedSocket(local);
+			//			serverSocket.addMessageReceivedHandler(this);
 			units = new ArrayList<Unit>();
 			//add server is to new
 			LC = new ServerClock();
-//			tom = new TomProcedure("1",LC);
-			
+			//			tom = new TomProcedure("1",LC);
+
 		}
-		
+
 	}
-	
-	public void init(ServerExecutor se) {
-		this.serverSocket = se.getSocket();
-		this.tom = new TomProcedure(se.getID(), LC);
-		
+
+	public void init(ServerExecutor se)
+	{
+		this.serverExecutor = se;
+		this.tom = new TomProcedure(se.getServerPortData().getID() + "", LC, srvMsgQueue);
+
 	}
 
 	/**
-	 * Singleton method which returns the sole 
-	 * instance of the battlefield.
+	 * Singleton method which returns the sole instance of the battlefield.
 	 * 
 	 * @return the battlefield.
 	 */
-	public static BattleField getBattleField() {
+	public static BattleField getBattleField()
+	{
 		if (battlefield == null)
 			battlefield = new BattleField(MAP_WIDTH, MAP_HEIGHT);
 		return battlefield;
 	}
-	
+
 	/**
-	 * Puts a new unit at the specified position. First, it
-	 * checks whether the position is empty, if not, it
-	 * does nothing.
-	 * In addition, the unit is also put in the list of known units.
+	 * Puts a new unit at the specified position. First, it checks whether the
+	 * position is empty, if not, it does nothing. In addition, the unit is also
+	 * put in the list of known units.
 	 * 
-	 * @param unit is the actual unit being spawned 
-	 * on the specified position.
-	 * @param x is the x position.
-	 * @param y is the y position.
-	 * @return true when the unit has been put on the 
-	 * specified position.
+	 * @param unit
+	 *            is the actual unit being spawned on the specified position.
+	 * @param x
+	 *            is the x position.
+	 * @param y
+	 *            is the y position.
+	 * @return true when the unit has been put on the specified position.
 	 */
 	private boolean spawnUnit(Unit unit, int x, int y)
 	{
-		synchronized (this) {
+		synchronized (this)
+		{
 			if (map[x][y] != null)
 				return false;
-	
+
 			map[x][y] = unit;
 			unit.setPosition(x, y);
 		}
@@ -119,16 +121,16 @@ public class BattleField implements IMessageReceivedHandler {
 	}
 
 	/**
-	 * Put a unit at the specified position. First, it
-	 * checks whether the position is empty, if not, it
-	 * does nothing.
+	 * Put a unit at the specified position. First, it checks whether the
+	 * position is empty, if not, it does nothing.
 	 * 
-	 * @param unit is the actual unit being put 
-	 * on the specified position.
-	 * @param x is the x position.
-	 * @param y is the y position.
-	 * @return true when the unit has been put on the 
-	 * specified position.
+	 * @param unit
+	 *            is the actual unit being put on the specified position.
+	 * @param x
+	 *            is the x position.
+	 * @param y
+	 *            is the y position.
+	 * @return true when the unit has been put on the specified position.
 	 */
 	private synchronized boolean putUnit(Unit unit, int x, int y)
 	{
@@ -144,10 +146,12 @@ public class BattleField implements IMessageReceivedHandler {
 	/**
 	 * Get a unit from a position.
 	 * 
-	 * @param x position.
-	 * @param y position.
-	 * @return the unit at the specified position, or return
-	 * null if there is no unit at that specific position.
+	 * @param x
+	 *            position.
+	 * @param y
+	 *            position.
+	 * @return the unit at the specified position, or return null if there is no
+	 *         unit at that specific position.
 	 */
 	public Unit getUnit(int x, int y)
 	{
@@ -160,9 +164,12 @@ public class BattleField implements IMessageReceivedHandler {
 	/**
 	 * Move the specified unit a certain number of steps.
 	 * 
-	 * @param unit is the unit being moved.
-	 * @param deltax is the delta in the x position.
-	 * @param deltay is the delta in the y position.
+	 * @param unit
+	 *            is the unit being moved.
+	 * @param deltax
+	 *            is the delta in the x position.
+	 * @param deltay
+	 *            is the delta in the y position.
 	 * 
 	 * @return true on success.
 	 */
@@ -176,8 +183,10 @@ public class BattleField implements IMessageReceivedHandler {
 
 		if (newX >= 0 && newX < BattleField.MAP_WIDTH)
 			if (newY >= 0 && newY < BattleField.MAP_HEIGHT)
-				if (map[newX][newY] == null) {
-					if (putUnit(unit, newX, newY)) {
+				if (map[newX][newY] == null)
+				{
+					if (putUnit(unit, newX, newY))
+					{
 						map[originalX][originalY] = null;
 						return true;
 					}
@@ -187,10 +196,13 @@ public class BattleField implements IMessageReceivedHandler {
 	}
 
 	/**
-	 * Remove a unit from a specific position and makes the unit disconnect from the server.
+	 * Remove a unit from a specific position and makes the unit disconnect from
+	 * the server.
 	 * 
-	 * @param x position.
-	 * @param y position.
+	 * @param x
+	 *            position.
+	 * @param y
+	 *            position.
 	 */
 	private synchronized void removeUnit(int x, int y)
 	{
@@ -204,33 +216,40 @@ public class BattleField implements IMessageReceivedHandler {
 
 	/**
 	 * Returns a new unique unit ID.
+	 * 
 	 * @return int: a new unique unit ID.
 	 */
-	public synchronized int getNewUnitID() {
+	public synchronized int getNewUnitID()
+	{
 		return ++lastUnitID;
 	}
 
-	public void onMessageReceived(Message msg) {
+	public void onMessageReceived(Message msg)
+	{
 		//Needs work
 		tom.submitMsgToTOM(msg);
 	}
-	
-	public void receivedClientMessage(Message msg) {
+
+	public void receivedClientMessage(Message msg)
+	{
 		//this.rcvMsgQueue = msg
 	}
-	
-	public void receivedServerMessage(Message msg) {
-		srvMsgQueue.add(msg);	
+
+	public void receivedServerMessage(Message msg)
+	{
+		srvMsgQueue.add(msg);
 	}
-	
-	public void processTomMessages() {
-		if (tom.isMessageAvailable()) {
+
+	public void processTomMessages()
+	{
+		if (tom.isMessageAvailable())
+		{
 			Message msg = tom.getExecutableMsgFromTOM();
 			String origin = (String)msg.get("origin");
 			MessageRequest request = (MessageRequest)msg.get("request");
 			Message reply = null;
 			Unit unit;
-			switch(request)
+			switch (request)
 			{
 			case spawnUnit:
 				this.spawnUnit((Unit)msg.get("unit"), (Integer)msg.get("x"), (Integer)msg.get("y"));
@@ -264,7 +283,8 @@ public class BattleField implements IMessageReceivedHandler {
 					reply.put("type", UnitType.player);
 				else if (getUnit(x, y) instanceof Dragon)
 					reply.put("type", UnitType.dragon);
-				else reply.put("type", UnitType.undefined);
+				else
+					reply.put("type", UnitType.undefined);
 				break;
 			}
 			case dealDamage:
@@ -273,7 +293,7 @@ public class BattleField implements IMessageReceivedHandler {
 				int y = (Integer)msg.get("y");
 				unit = this.getUnit(x, y);
 				if (unit != null)
-					unit.adjustHitPoints( -(Integer)msg.get("damage") );
+					unit.adjustHitPoints(-(Integer)msg.get("damage"));
 				/* Copy the id of the message so that the unit knows 
 				 * what message the battlefield responded to. 
 				 */
@@ -285,7 +305,7 @@ public class BattleField implements IMessageReceivedHandler {
 				int y = (Integer)msg.get("y");
 				unit = this.getUnit(x, y);
 				if (unit != null)
-					unit.adjustHitPoints( (Integer)msg.get("healed") );
+					unit.adjustHitPoints((Integer)msg.get("healed"));
 				/* Copy the id of the message so that the unit knows 
 				 * what message the battlefield responded to. 
 				 */
@@ -308,25 +328,20 @@ public class BattleField implements IMessageReceivedHandler {
 			//serverSocket.sendMessage(reply, origin);
 		}
 	}
-		
 
-	
-	
-	
-	
 	/**
-	 * Close down the battlefield. Unregisters
-	 * the serverSocket so the program can 
-	 * actually end.
-	 */ 
-	public synchronized void shutdown() {
+	 * Close down the battlefield. Unregisters the serverSocket so the program
+	 * can actually end.
+	 */
+	public synchronized void shutdown()
+	{
 		// Remove all units from the battlefield and make them disconnect from the server
-		for (Unit unit : units) {
+		for (Unit unit : units)
+		{
 			unit.disconnect();
 			unit.stopRunnerThread();
 		}
 		this.tom.close();
-		serverSocket.unRegister();
 	}
-	
+
 }
