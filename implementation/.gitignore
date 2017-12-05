@@ -23,3 +23,6 @@ hs_err_pid*
 
 # Evince project files
 *.project
+
+# Logfiles
+Logs/

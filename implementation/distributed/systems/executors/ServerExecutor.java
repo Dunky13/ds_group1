@@ -19,6 +19,7 @@ public class ServerExecutor
 	public static final int TIME_BETWEEN_PLAYER_LOGIN = 5000; // In milliseconds
 	public static BattleField battlefield; 
 	public static int playerCount;
+	public static int srvId;
 	public static Logger logger;
 	static String testpath; //= getClass().getProtectionDomain().getCodeSource().getLocation().toString();
 	private ServerAndPorts sp;
@@ -35,6 +36,7 @@ public class ServerExecutor
 		serverSendReceive = new ServerSendReceive(this);
 		//System.out.println("after serverSendReceive");
 		testpath = getClass().getProtectionDomain().getCodeSource().getLocation().toString();
+		srvId = serverID;
 		if (serverID == 0 || serverID == 1)
 		{
 			GameState.setAmIaLoger(true);
@@ -122,17 +124,19 @@ public class ServerExecutor
 		System.out.println("All players initialized. Starting viewer...");
 		if (GameState.getAmIaLogger())logger.logText("All players initialized. Starting viewer...");
 		/* Spawn a new battlefield viewer */
+		if (srvId == 0) {
 		new Thread(new Runnable() {
 			public void run() {
 				new BattleFieldViewer();
 			}
 		}).start();
-		
+		}
 		/* Add a random player every (5 seconds x GAME_SPEED) so long as the
 		 * maximum number of players to enter the battlefield has not been exceeded. 
 		 */
 		System.out.println("Viewer created. Spinning on Running state");
 		while(GameState.getRunningState()) {
+			System.out.println("Running..");
 			try {
 				Thread.sleep((int)(5000 * GameState.GAME_SPEED));
 
@@ -155,6 +159,7 @@ public class ServerExecutor
 				final int finalY = y;
 
 				if (battlefield.getUnit(x, y) == null) {
+					System.out.println("New player created!");
 					new Player(finalX, finalY);
 					/* Create the new player in a separate
 					 * thread, making sure it does not 
@@ -167,6 +172,7 @@ public class ServerExecutor
 					}).start();
 					*/
 					playerCount++;
+					System.out.println("playercount is: "+ playerCount);
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();

@@ -142,6 +142,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		// Send a spawn message
 		//		clientSocket.sendMessage(damageMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(damageMessage);
+		System.out.println("Unit:dealDamage");
 		this.serverExecutor.sendMessageToOne(sp,damageMessage);
 	}
 
@@ -166,6 +167,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 
 		// Send a spawn message
 		//		clientSocket.sendMessage(healMessage, "localsocket://" + BattleField.serverID);
+		System.out.println("Unit:healDamage");
 		this.serverExecutor.sendMessageToOne(sp,healMessage);
 		//this.serverExecutor.sendMessageToMany(healMessage); This is wrong
 	}
@@ -257,6 +259,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 
 		//clientSocket.sendMessage(spawnMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(spawnMessage);
+		System.out.println("Unit:spawn");
 		this.serverExecutor.sendMessageToOne(sp,spawnMessage);
 		// Wait for the unit to be placed
 		getUnit(x, y);
@@ -287,6 +290,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		// Send the getUnit message
 		//		clientSocket.sendMessage(getMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(getMessage);
+		System.out.println("Unit:getType");
 		this.serverExecutor.sendMessageToOne(sp,getMessage);
 
 		// Wait for the reply
@@ -326,6 +330,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		// Send the getUnit message
 		//		clientSocket.sendMessage(getMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(getMessage);
+		System.out.println("Unit:getUnit");
 		this.serverExecutor.sendMessageToOne(sp,getMessage);
 		// Wait for the reply
 		while (!messageList.containsKey(id))

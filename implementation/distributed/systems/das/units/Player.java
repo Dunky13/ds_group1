@@ -54,13 +54,14 @@ public class Player extends Unit implements Runnable, Serializable
 	public Player(int x, int y)
 	{
 		/* Initialize the hitpoints and attackpoints */
+		
 		super(
 			(int)(Math.random() * (MAX_HITPOINTS - MIN_HITPOINTS) + MIN_HITPOINTS),
 			(int)(Math.random() * (MAX_ATTACKPOINTS - MIN_ATTACKPOINTS) + MIN_ATTACKPOINTS));
 
 		/* Create a random delay */
 		timeBetweenTurns = (int)(Math.random() * (MAX_TIME_BETWEEN_TURNS - MIN_TIME_BETWEEN_TURNS)) + MIN_TIME_BETWEEN_TURNS;
-
+		System.out.println("Player constructor called");
 		if (!spawn(x, y))
 			return; // We could not spawn on the battlefield
 
@@ -68,6 +69,7 @@ public class Player extends Unit implements Runnable, Serializable
 		//new Thread(this).start();
 		runnerThread = new Thread(this);
 		runnerThread.start();
+		System.out.println("runnerThread returned");
 	}
 
 	/**

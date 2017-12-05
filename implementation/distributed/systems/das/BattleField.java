@@ -74,6 +74,7 @@ public class BattleField implements IMessageReceivedHandler
 
 	public void init(ServerExecutor se)
 	{
+		System.out.println("init method of battlefield called!");
 		this.serverExecutor = se;
 		this.tom = new TomProcedure(se, LC, srvMsgQueue);
 
