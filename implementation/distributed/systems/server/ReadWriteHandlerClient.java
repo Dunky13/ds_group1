@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 // class that handles the messages with the server
 class ReadWriteHandlerClient implements CompletionHandler<Integer, Attachment>
 {
+	@Override
 	public void completed(Integer result, Attachment attach)
 	{
 		if (attach.isRead)
@@ -28,6 +29,7 @@ class ReadWriteHandlerClient implements CompletionHandler<Integer, Attachment>
 		}
 	}
 
+	@Override
 	public void failed(Throwable e, Attachment attach)
 	{
 		e.printStackTrace();
