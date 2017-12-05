@@ -68,7 +68,7 @@ public class TomProcedure
 		LCpriority lcPriority = new LCpriority();
 		executionQueue = new PriorityBlockingQueue<Message>(INITIAL_CAPACITY, lcPriority);
 		srvMsgQueue = inRecvMsgs; // Use it in receiveThread
-		logger = new Logger();
+		//logger = new Logger();
 		localServerId = se.getServerPortData().getID() + "";
 		LC = inLC;
 		PT = new ProposedTimestamps();

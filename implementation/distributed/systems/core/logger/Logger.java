@@ -169,6 +169,26 @@ public class Logger
 		toPrint.add(texts);
 	}
 
+	
+	/**
+	 * DONT REMOVE THIS!
+	 * 
+	 * @param text
+	 */
+	public void logText(String text) {
+		try {
+			File logfile = new File(fullFilePath);
+			FileWriter fw = new FileWriter(logfile,true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(text);
+			bw.newLine();
+			bw.close();
+		}catch(IOException e) {
+			e.printStackTrace();
+		}	
+	}
+	
+	
 	/**
 	 * Use to log other events such as spawn disconnect, etc..
 	 * 

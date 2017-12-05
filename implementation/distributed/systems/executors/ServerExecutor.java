@@ -3,6 +3,7 @@ package distributed.systems.executors;
 import distributed.systems.core.Constants;
 import distributed.systems.core.Message;
 import distributed.systems.core.ServerAndPorts;
+import distributed.systems.core.logger.Logger;
 import distributed.systems.das.BattleField;
 import distributed.systems.das.GameState;
 import distributed.systems.das.presentation.BattleFieldViewer;
@@ -18,6 +19,7 @@ public class ServerExecutor
 	public static final int TIME_BETWEEN_PLAYER_LOGIN = 5000; // In milliseconds
 	public static BattleField battlefield; 
 	public static int playerCount;
+	public static Logger logger;
 
 	private ServerAndPorts sp;
 	private ServerSendReceive serverSendReceive;
@@ -29,10 +31,11 @@ public class ServerExecutor
 		battlefield = BattleField.getBattleField();
 		battlefield.init(this);
 		serverSendReceive = new ServerSendReceive(this);
-		
+		logger = new Logger();
 		if (serverID == 0 || serverID == 1)
 		{
 			GameState.setAmIaLoger(true);
+			logger.logText("I am a logger server (id:" + serverID + ")");
 		}
 	}
 
@@ -46,7 +49,8 @@ public class ServerExecutor
 		ServerExecutor se = new ServerExecutor(Integer.parseInt(args[0]));
 		
 		//battlefield = BattleField.getBattleField();
-
+		if (GameState.getAmIaLogger())logger.createLogFile();
+		if (GameState.getAmIaLogger())logger.logText("Game started!");
 		/* All the dragons connect */
 		for(int i = 0; i < DRAGON_COUNT; i++) {
 			/* Try picking a random spot */
@@ -75,6 +79,7 @@ public class ServerExecutor
 
 		}
 
+		if (GameState.getAmIaLogger())logger.logText("Dragons connected, Initializing players...");
 		/* Initialize a random number of players (between [MIN_PLAYER_COUNT..MAX_PLAYER_COUNT] */
 		playerCount = (int)((MAX_PLAYER_COUNT - MIN_PLAYER_COUNT) * Math.random() + MIN_PLAYER_COUNT);
 		for(int i = 0; i < playerCount; i++)
@@ -104,7 +109,7 @@ public class ServerExecutor
 			}).start();
 			
 		}
-
+		if (GameState.getAmIaLogger())logger.logText("All players initialized. Starting viewer...");
 		/* Spawn a new battlefield viewer */
 		new Thread(new Runnable() {
 			public void run() {

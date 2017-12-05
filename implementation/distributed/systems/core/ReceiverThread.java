@@ -38,7 +38,6 @@ public class ReceiverThread implements Runnable
 			try {
 				msg = receivedMsgQueue.take();
 			} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			switch((Integer) msg.get("type"))
@@ -113,10 +112,10 @@ public class ReceiverThread implements Runnable
 		for(Iterator i=it; it.hasNext();) {//untested
 			Message m = (Message) i.next();
 			if((Integer)m.get("id")==msgId) {
-				it.remove();
+				it.remove(); //Remove from undeliverables
 				break;
 			}
-		}//Remove from undeliverables
+		}
 		msg.put("LC",msg.get("MaxLC")); //Replace LC with maxLC
 		msg.removeMsgKeyVal("type");
 		msg.removeMsgKeyVal("MaxLC");
