@@ -21,9 +21,13 @@ public class Message implements Serializable
 	public Message()
 	{
 		contents = new HashMap<String, Serializable>();
-
 	}
-
+	
+	public boolean containsKey(String key)
+	{
+		return contents.containsKey(key);
+	}
+	
 	public void put(String key, Serializable value)
 	{
 		contents.put(key, value);

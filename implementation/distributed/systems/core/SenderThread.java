@@ -5,6 +5,7 @@ import java.util.concurrent.BlockingQueue;
 
 import distributed.systems.core.Message;
 import distributed.systems.das.GameState;
+import distributed.systems.executors.ServerExecutor;
 
 //Start the thread like this: thread = new Thread(new SenderThread);
 public class SenderThread implements Runnable 
@@ -15,9 +16,11 @@ public class SenderThread implements Runnable
 	private ServerClock LC;
 	private ProposedTimestamps proposedTimestamps;
 	private Message msg;
+	public ServerExecutor se;
 	
-	public SenderThread(BlockingQueue<Message> processQ, BlockingQueue<Message> undeliverableQ,  BlockingQueue<Message> executionQ, ServerClock inLC, ProposedTimestamps inPt)
+	public SenderThread(ServerExecutor inSe, BlockingQueue<Message> processQ, BlockingQueue<Message> undeliverableQ,  BlockingQueue<Message> executionQ, ServerClock inLC, ProposedTimestamps inPt)
 	{
+		se = inSe;
 		processQueue = processQ;
 		unDeliverablesQueue = undeliverableQ;
 		executionQueue = executionQ;
@@ -75,6 +78,7 @@ public class SenderThread implements Runnable
 	private void sendMessageToOtherServers(Message msg, int type) {
 		msg.put("type", type); //type 1 for originator messages.
 		//TO-DO: Multicast
+		se.sendMessageToMany(msg);
 		
 	}	
 	

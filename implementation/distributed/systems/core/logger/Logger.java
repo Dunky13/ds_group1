@@ -27,13 +27,12 @@ public class Logger
 		String remove = "file:";
 		filename = "DAS_Game_log.txt";
 		logFolderName = getClass().getProtectionDomain().getCodeSource().getLocation().toString();
-		logFolderName += "logger/Logs"; //Change "logger" to package path
+		logFolderName += "distributed.systems/Logs"; //Change "logger" to package path
 		logFolderName = logFolderName.replace(remove, "");
 		fullFilePath = logFolderName + "/" + filename;
 		logRunning = true;
 		logThread = new Thread(new Runnable()
 		{
-			@Override
 			public void run()
 			{
 				try

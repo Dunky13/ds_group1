@@ -5,6 +5,7 @@ import java.util.concurrent.BlockingQueue;
 
 import distributed.systems.core.Message;
 import distributed.systems.das.GameState;
+import distributed.systems.executors.ServerExecutor;
 
 
 public class ReceiverThread implements Runnable 
@@ -16,8 +17,9 @@ public class ReceiverThread implements Runnable
 	private ServerClock LC;
 	private Message msg;
 	private ProposedTimestamps proposedTimestamps;
+	private ServerExecutor se;
 	
-	public ReceiverThread(BlockingQueue<Message> executableQ, BlockingQueue<Message> unDeliverablesQ, BlockingQueue<Message> receivedMsgQ, ServerClock inLC, ProposedTimestamps inPt)
+	public ReceiverThread(ServerExecutor inSe,BlockingQueue<Message> executableQ, BlockingQueue<Message> unDeliverablesQ, BlockingQueue<Message> receivedMsgQ, ServerClock inLC, ProposedTimestamps inPt)
 	{
 		executableQueue = executableQ;
 		unDeliverablesQueue = unDeliverablesQ;
@@ -25,6 +27,7 @@ public class ReceiverThread implements Runnable
 		receivedMsgQueue = receivedMsgQ;
 		LC = inLC;
 		proposedTimestamps = inPt;
+		se=inSe;
 		msg = null;
 	}
 	
@@ -61,13 +64,12 @@ public class ReceiverThread implements Runnable
 	 * @param msg
 	 */
 	public void procOriginatorMsg(Message msg) {
-		int origLc = (Integer)msg.get("LC"); //get originators clock
-		int localLc = LC.getClockValue(); // get local clock
-		if(origLc > localLc) LC.advanceClock(origLc); //compare and advance if needed
-		localLc = LC.getClockValue(); //get the new LC value
-		int originId = (Integer)msg.get("serverID");
+		//int origLc = (Integer)msg.get("LC"); //get originators clock
+		//int localLc = LC.getClockValue(); // get local clock
+		//if(origLc > localLc) LC.advanceClock(origLc); //compare and advance if needed
+		int localLc = LC.getClockValue(); //get the new LC value
 		msg.put("proposedLC", localLc);
-		msg.put("type", 2); //turn into proposedLC type
+		msg.put("type", Constants.PROPOSED_TIMESTAMP_MSG); //turn into proposedLC type
 		unDeliverablesQueue.add(msg);
 		sendLocalLcToOriginator(msg);
 	}
@@ -80,10 +82,7 @@ public class ReceiverThread implements Runnable
 	public void sendLocalLcToOriginator(Message msg){
 		int outgoingServerId = (Integer) msg.get("serverID");
 		ServerAndPorts sp = Constants.SERVER_PORT[outgoingServerId];
-		int localLC = LC.getClockValue();
-		//ADD 1 to 1 communication code here towards outgoingServerId
-		//...		
-		
+		se.sendMessageToOne(sp, msg);		
 	}
 	
 	
@@ -117,8 +116,7 @@ public class ReceiverThread implements Runnable
 				it.remove();
 				break;
 			}
-		}
-		//Remove from undeliverables
+		}//Remove from undeliverables
 		msg.put("LC",msg.get("MaxLC")); //Replace LC with maxLC
 		msg.removeMsgKeyVal("type");
 		msg.removeMsgKeyVal("MaxLC");

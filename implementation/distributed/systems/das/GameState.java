@@ -14,6 +14,8 @@ public class GameState {
 	public static final double GAME_SPEED = .01;
 	// The number of players in the game
 	private static int playerCount = 0;
+	
+	private static volatile boolean amIaLogger = false;
 
 	/**
 	 * Stop the program from running. Inform all threads
@@ -39,4 +41,13 @@ public class GameState {
 	public static int getPlayerCount() {
 		return playerCount;
 	}
+	
+	public static boolean getAmIaLogger() {
+		return amIaLogger;
+	}
+	
+	public static void setAmIaLoger(boolean in) {
+		amIaLogger=in;
+	}
+	
 }

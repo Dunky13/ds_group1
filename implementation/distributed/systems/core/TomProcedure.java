@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import distributed.systems.core.logger.Logger;
+import distributed.systems.executors.ServerExecutor;
 
 //Types of messages wrt to threads
 //Originator (new) message = 1
@@ -44,6 +45,7 @@ public class TomProcedure
 	//private ExecutorService service;
 	private Thread tomSenderThread;
 	private Thread tomReceiverThread;
+	public ServerExecutor se;
 
 	//1)Insertion in this queue signifies the start of the Tom process for that message.
 	public static LinkedBlockingQueue<Message> processQueue;
@@ -59,7 +61,7 @@ public class TomProcedure
 	public LinkedBlockingQueue<Message> srvMsgQueue;
 
 	//Default Constructor
-	public TomProcedure(String serverId, ServerClock inLC, LinkedBlockingQueue<Message> inRecvMsgs)
+	public TomProcedure(ServerExecutor inse, ServerClock inLC, LinkedBlockingQueue<Message> inRecvMsgs )
 	{
 		processQueue = new LinkedBlockingQueue<Message>();
 		unDeliverablesQueue = new LinkedBlockingQueue<Message>();
@@ -67,20 +69,21 @@ public class TomProcedure
 		executionQueue = new PriorityBlockingQueue<Message>(INITIAL_CAPACITY, lcPriority);
 		srvMsgQueue = inRecvMsgs; // Use it in receiveThread
 		logger = new Logger();
-		localServerId = serverId;
+		localServerId = se.getServerPortData().getID() + "";
 		LC = inLC;
 		PT = new ProposedTimestamps();
-
-		tomSenderThread = new Thread(new SenderThread(processQueue, unDeliverablesQueue, executionQueue, LC, PT));
+		se=inse;
+		
+		tomSenderThread = new Thread(new SenderThread(se,processQueue, unDeliverablesQueue, executionQueue, LC, PT));
 		tomSenderThread.start();
-		tomReceiverThread = new Thread(new SenderThread(processQueue, unDeliverablesQueue, executionQueue, LC, PT));
+		tomReceiverThread = new Thread(new ReceiverThread(se,processQueue, unDeliverablesQueue, executionQueue, LC, PT));
 		tomSenderThread.start();
 		// Simplify for now with just a single receiver thread
 		//		service = Executors.newFixedThreadPool(Constants.THREAD_POOL_SIZE);
 		//		for (int i = 0; i < Constants.THREAD_POOL_SIZE; i++) {
 		//			service.submit(new ReceiverThread(executionQueue, unDeliverablesQueue,srvMsgQueue,LC,PT));
 		//		}
-
+		
 	}
 
 	//QUEUE METHODS

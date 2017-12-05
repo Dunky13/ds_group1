@@ -70,13 +70,12 @@ public class BattleField implements IMessageReceivedHandler
 			//			tom = new TomProcedure("1",LC);
 
 		}
-
 	}
 
 	public void init(ServerExecutor se)
 	{
 		this.serverExecutor = se;
-		this.tom = new TomProcedure(se.getServerPortData().getID() + "", LC, srvMsgQueue);
+		this.tom = new TomProcedure(se, LC, srvMsgQueue);
 
 	}
 
@@ -226,13 +225,51 @@ public class BattleField implements IMessageReceivedHandler
 
 	public void onMessageReceived(Message msg)
 	{
-		//Needs work
-		tom.submitMsgToTOM(msg);
+		//If message is of type getUnit/getType answer immediately
+		//otherwise submit message to TOM
+
+		
 	}
 
 	public void receivedClientMessage(Message msg)
 	{
-		//this.rcvMsgQueue = msg
+		MessageRequest request = (MessageRequest)msg.get("request");
+		Message reply;
+		switch (request) {
+			case getUnit:
+			{
+				reply = new Message();
+				int x = (Integer)msg.get("x");
+				int y = (Integer)msg.get("y");
+				reply.put("id", msg.get("id"));
+				reply.put("unit", getUnit(x, y));
+				//send message back here
+				break;
+			}
+			case getType:
+			{
+				reply = new Message();
+				int x = (Integer)msg.get("x");
+				int y = (Integer)msg.get("y");
+				reply.put("id", msg.get("id"));
+				if (getUnit(x, y) instanceof Player)
+					reply.put("type", UnitType.player);
+				else if (getUnit(x, y) instanceof Dragon)
+					reply.put("type", UnitType.dragon);
+				else
+					reply.put("type", UnitType.undefined);
+				
+				
+				//send message back here
+				break;
+			}
+		
+			default:{
+				tom.submitMsgToTOM(msg);
+				break;
+			}
+		}
+		
 	}
 
 	public void receivedServerMessage(Message msg)
@@ -342,6 +379,11 @@ public class BattleField implements IMessageReceivedHandler
 			unit.stopRunnerThread();
 		}
 		this.tom.close();
+	}
+
+	public ServerExecutor getServerExecutor()
+	{
+		return this.serverExecutor;
 	}
 
 }
