@@ -149,40 +149,20 @@ public class ServerSendReceive
     }
   }
 
-  //	private static void askForInput()
-  //	{
-  //		while (true)
-  //		{
-  //			try
-  //			{
-  //				System.out.print("\u001B[32m" + "enter a message: " + "\u001B[0m");
-  //				String msg = (new BufferedReader(new InputStreamReader(System.in))).readLine();
-  //				System.out.print("\u001B[32m" + "enter 0 for send to All, port number otherwise: " + "\u001B[0m");
-  //				int port = Integer.parseInt((new BufferedReader(new InputStreamReader(System.in))).readLine());
-  //				if (port == 0)
-  //				{
-  //					sendToAll(msg);
-  //				}
-  //				else
-  //				{
-  //					sendToOne(msg, port);
-  //				}
-  //			}
-  //			catch (Exception e)
-  //			{
-  //			}
-  //		}
-  //	}
-
-  //	public static void main(String[] args) throws Exception
-  //	{
-  //		// arguments checking
-  //		if (args.length != 1)
-  //		{
-  //			System.out.println("missing server port argument");
-  //			System.exit(1);
-  //		}
-  //
-  //		
-  //	}
+  public static void sendMoveToServer(int port, Message msg) throws Exception {
+    AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
+    SocketAddress serverAddr = new InetSocketAddress("localhost", port);
+    Future<Void> result = channel.connect(serverAddr);
+    result.get();
+    System.out.println("Connected");
+    Attachment attach = new Attachment();
+    attach.channel = channel;
+    byte[] data = msg.serialize();
+    attach.buffer = ByteBuffer.allocate(2048);
+    attach.isRead = false;
+    attach.buffer.put(data);
+    attach.buffer.flip();
+    ReadWriteHandlerClient readWriteHandler = new ReadWriteHandlerClient();
+    attach.channel.write(attach.buffer, attach, readWriteHandler);
+  }
 }
