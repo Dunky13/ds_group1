@@ -34,6 +34,7 @@ public class ServerExecutor
 		serverSendReceive = new ServerSendReceive(this);
 		System.out.println("after serverSendReceive");
 		logger = new Logger();
+		logger.createLogFile();
 		testpath = getClass().getProtectionDomain().getCodeSource().getLocation().toString();
 		if (serverID == 0 || serverID == 1)
 		{
