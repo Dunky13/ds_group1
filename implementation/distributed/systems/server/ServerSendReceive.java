@@ -1,6 +1,7 @@
 package distributed.systems.server;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
@@ -149,7 +150,8 @@ public class ServerSendReceive
     }
   }
 
-  public static void sendMoveToServer(int port, Message msg) throws Exception {
+  public static void sendMoveToServer(int port, Message msg){
+	try {  
     AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
     SocketAddress serverAddr = new InetSocketAddress("localhost", port);
     Future<Void> result = channel.connect(serverAddr);
@@ -164,5 +166,8 @@ public class ServerSendReceive
     attach.buffer.flip();
     ReadWriteHandlerClient readWriteHandler = new ReadWriteHandlerClient();
     attach.channel.write(attach.buffer, attach, readWriteHandler);
+	}catch (Exception e) {
+    	e.printStackTrace();
+    }
   }
 }

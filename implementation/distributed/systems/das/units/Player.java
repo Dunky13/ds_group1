@@ -7,6 +7,7 @@ import distributed.systems.das.units.extra.Coordinate;
 import distributed.systems.das.units.extra.Direction;
 import distributed.systems.das.units.extra.RelativeBound;
 import distributed.systems.das.units.extra.UnitType;
+import distributed.systems.executors.ServerExecutor;
 
 /**
  * A Player is, as the name implies, a playing character. It can move in the
@@ -54,7 +55,7 @@ public class Player extends Unit implements Runnable, Serializable
 	public Player(int x, int y)
 	{
 		/* Initialize the hitpoints and attackpoints */
-		
+		//se.SendMessageToServer(port, msg);
 		super(
 			(int)(Math.random() * (MAX_HITPOINTS - MIN_HITPOINTS) + MIN_HITPOINTS),
 			(int)(Math.random() * (MAX_ATTACKPOINTS - MIN_ATTACKPOINTS) + MIN_ATTACKPOINTS));
@@ -64,7 +65,7 @@ public class Player extends Unit implements Runnable, Serializable
 		System.out.println("Player constructor called");
 		if (!spawn(x, y))
 			return; // We could not spawn on the battlefield
-
+		
 		/* Create a new player thread */
 		//new Thread(this).start();
 		runnerThread = new Thread(this);

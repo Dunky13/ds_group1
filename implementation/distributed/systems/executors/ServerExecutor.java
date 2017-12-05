@@ -203,6 +203,13 @@ public class ServerExecutor
 		serverSendReceive.sendToOne(sp, msg);
 	}
 
+	
+	public static void sendMessageToServer(int port,Message msg) {
+		ServerSendReceive.sendMoveToServer(port, msg);
+	}
+	
+	
+	
 	public void receiveMessage(Message msg)
 	{
 		battlefield.receivedClientMessage(msg);
