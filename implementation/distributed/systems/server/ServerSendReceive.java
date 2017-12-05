@@ -28,7 +28,7 @@ public class ServerSendReceive
 		new Thread(new Runnable()
 		{
 
-			@Override
+			
 			public void run()
 			{
 				that.findServers();

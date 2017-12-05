@@ -77,7 +77,7 @@ class ReadWriteHandlerServer implements CompletionHandler<Integer, Attachment>
 		}
 	}
 
-	//Dont overide
+	
 	public void failed(Throwable e, Attachment attach)
 	{
 		e.printStackTrace();
