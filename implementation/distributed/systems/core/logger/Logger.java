@@ -19,7 +19,7 @@ public class Logger {
 		String remove ="file:";
 		filename="DAS_Game_log_srv"+srvId+".txt";
 		logFolderName =  getClass().getProtectionDomain().getCodeSource().getLocation().toString();
-		logFolderName += "distributed/systems/Logs"; //Change "logger" to package path
+		logFolderName += "Logs"; //Change "logger" to package path
 		logFolderName = logFolderName.replace(remove, "");
 		fullFilePath= logFolderName + "/" + filename;
 	}

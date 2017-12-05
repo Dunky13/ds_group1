@@ -24,6 +24,7 @@ public class ServerExecutor
 	private ServerAndPorts sp;
 	private ServerSendReceive serverSendReceive;
 	//private BattleField b;
+	private static volatile boolean serversConnected = false;
 
 	ServerExecutor(int serverID)
 	{
@@ -85,7 +86,7 @@ public class ServerExecutor
 			}).start();
 
 		}
-
+		
 		if (GameState.getAmIaLogger())logger.logText("Dragons connected, Initializing players...");
 		/* Initialize a random number of players (between [MIN_PLAYER_COUNT..MAX_PLAYER_COUNT] */
 		playerCount = (int)((MAX_PLAYER_COUNT - MIN_PLAYER_COUNT) * Math.random() + MIN_PLAYER_COUNT);
@@ -116,6 +117,8 @@ public class ServerExecutor
 			}).start();
 			
 		}
+		while (!serversConnected){}
+		
 		System.out.println("All players initialized. Starting viewer...");
 		if (GameState.getAmIaLogger())logger.logText("All players initialized. Starting viewer...");
 		/* Spawn a new battlefield viewer */
@@ -128,6 +131,7 @@ public class ServerExecutor
 		/* Add a random player every (5 seconds x GAME_SPEED) so long as the
 		 * maximum number of players to enter the battlefield has not been exceeded. 
 		 */
+		System.out.println("Viewer created. Spinning on Running state");
 		while(GameState.getRunningState()) {
 			try {
 				Thread.sleep((int)(5000 * GameState.GAME_SPEED));
@@ -177,7 +181,9 @@ public class ServerExecutor
 	}
 
 		
-		
+	public void serversConnected() {
+		this.serversConnected = true;
+	}
 	
 
 	public void sendMessageToMany(Message msg)

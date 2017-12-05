@@ -69,13 +69,14 @@ public class TomProcedure
 		LCpriority lcPriority = new LCpriority();
 		executionQueue = new PriorityBlockingQueue<Message>(INITIAL_CAPACITY, lcPriority);
 		srvMsgQueue = inRecvMsgs; // Use it in receiveThread
-		//logger = new Logger();
+		
 		se=inse;
 		localServerId = se.getServerPortData().getID() + "";
+		logger = new Logger(Integer.parseInt(localServerId));
 		LC = inLC;
 		PT = new ProposedTimestamps();
-		//if (GameState.getAmIaLogger())logger.logText("Dragons connected, Initializing players...");
-		
+		if (GameState.getAmIaLogger())logger.logText("TOM Initialized. Starting Threads");
+		System.out.println("TOM Initialized. Starting Threads");
 		tomSenderThread = new Thread(new SenderThread(se,processQueue, unDeliverablesQueue, executionQueue, LC, PT));
 		tomSenderThread.start();
 		tomReceiverThread = new Thread(new ReceiverThread(se,processQueue, unDeliverablesQueue, executionQueue, LC, PT));
@@ -98,6 +99,8 @@ public class TomProcedure
 	 */
 	public synchronized void submitMsgToTOM(Message msg)
 	{
+		if (GameState.getAmIaLogger())logger.logText("Message submitted to TOM");
+		if (GameState.getAmIaLogger())logger.logMessage(msg);
 		msg.put("LC", LC.getClockValue());
 		msg.put("serverID", localServerId);
 		processQueue.add(msg);
@@ -153,9 +156,10 @@ public class TomProcedure
 	// this can be done by a separate threads who continuously pulls the head of the execution queue
 	public Message getExecutableMsgFromTOM()
 	{
+		if (GameState.getAmIaLogger())logger.logText("Attempting to retrieve executable msg from TOM");
 		Message msg;
 		msg = executionQueue.remove(); //needs testing
-		logger.logMessage(msg);
+		if (GameState.getAmIaLogger())logger.logMessage(msg);
 		return msg;
 	}
 
@@ -166,6 +170,7 @@ public class TomProcedure
 	 */
 	public boolean isMessageAvailable()
 	{
+		System.out.println("isMessageAvailable called");
 		if (!executionQueue.isEmpty() && ((Integer)executionQueue.peek().get("isDeliverable")) == 1)
 		{
 			return true;

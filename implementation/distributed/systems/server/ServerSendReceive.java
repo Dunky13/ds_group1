@@ -76,6 +76,7 @@ public class ServerSendReceive
             if (aliveServers.size() == (Constants.SERVER_PORT.length - 1))
             {
               System.out.println("exiting");
+              serverExecutor.serversConnected();
               return;
             }
           }

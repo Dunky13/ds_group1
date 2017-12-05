@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 
 import distributed.systems.core.Message;
+import distributed.systems.core.logger.Logger;
 import distributed.systems.das.GameState;
 import distributed.systems.executors.ServerExecutor;
 
@@ -17,6 +18,7 @@ public class SenderThread implements Runnable
 	private ProposedTimestamps proposedTimestamps;
 	private Message msg;
 	public ServerExecutor se;
+	private Logger logger;
 	
 	public SenderThread(ServerExecutor inSe, BlockingQueue<Message> processQ, BlockingQueue<Message> undeliverableQ,  BlockingQueue<Message> executionQ, ServerClock inLC, ProposedTimestamps inPt)
 	{
@@ -27,6 +29,9 @@ public class SenderThread implements Runnable
 		LC = inLC;
 		proposedTimestamps=inPt;
 		msg = null;
+		logger = new Logger(se.getServerPortData().getID());
+		if (GameState.getAmIaLogger())logger.logText("Sender thread constructor called");
+		System.out.println("Sender thread constructor called");
 	}
 	
 	
@@ -59,6 +64,8 @@ public class SenderThread implements Runnable
 			sendMessageToOtherServers(msg, Constants.FINAL_TIMESTAMP_MSG);
 			Iterator iter = unDeliverablesQueue.iterator();
 			moveLocalMsgToExecutable(msg,iter);
+			if (GameState.getAmIaLogger())logger.logText("moveLocalMsgToExecutable called from thread loop");
+			System.out.println("moveLocalMsgToExecutable called from thread loop");
 		}
 	}
 	
@@ -68,6 +75,8 @@ public class SenderThread implements Runnable
 	 * @param msg
 	 */
 	public void moveLocalMsgToUndeliverables(Message msg) {
+		if (GameState.getAmIaLogger())logger.logText("moveLocalMsgToUndeliverables called");
+		System.out.println("moveLocalMsgToUndeliverables called");
 		msg.put("isDeliverable", 0);
 		msg.put("LC", LC.getClockValue());
 		unDeliverablesQueue.add(msg);
@@ -76,6 +85,8 @@ public class SenderThread implements Runnable
 	
 	
 	private void sendMessageToOtherServers(Message msg, int type) {
+		if (GameState.getAmIaLogger())logger.logText("sendMessageToOtherServers called");
+		System.out.println("sendMessageToOtherServers called");
 		msg.put("type", type); //type 1 for originator messages.
 		//TO-DO: Multicast
 		se.sendMessageToMany(msg);
@@ -83,6 +94,8 @@ public class SenderThread implements Runnable
 	}	
 	
 	public void moveLocalMsgToExecutable(Message msg, Iterator it) {
+		if (GameState.getAmIaLogger())logger.logText("moveLocalMsgToExecutable called");
+		System.out.println("moveLocalMsgToExecutable called");
 		int msgId = (Integer)msg.get("id");
 		int maxLC = (Integer)msg.get("MaxLC");
 		for(Iterator i=it; it.hasNext();) {//untested
@@ -112,6 +125,7 @@ public class SenderThread implements Runnable
 	 * @return
 	 */
 	public int computeMax(int...tss) {
+		System.out.println("Compute Max called!");
 		int result=0;
 		
 		for (int ts : tss) {

@@ -77,14 +77,14 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 
 		// Initialize the attack points
 		this.attackPoints = attackPoints;
-
+		
 		// Get a new unit id
-		serverExecutor = BattleField.getBattleField().getServerExecutor();
 		unitID = BattleField.getBattleField().getNewUnitID();
 
 		// Create a new socket
 		//		clientSocket = new SynchronizedSocket(localSocket);
-
+		serverExecutor = BattleField.getBattleField().getServerExecutor();
+		sp = serverExecutor.getServerPortData();
 		
 //		try
 //		{
