@@ -69,15 +69,16 @@ public class TomProcedure
 		executionQueue = new PriorityBlockingQueue<Message>(INITIAL_CAPACITY, lcPriority);
 		srvMsgQueue = inRecvMsgs; // Use it in receiveThread
 		//logger = new Logger();
+		se=inse;
 		localServerId = se.getServerPortData().getID() + "";
 		LC = inLC;
 		PT = new ProposedTimestamps();
-		se=inse;
+		
 		
 		tomSenderThread = new Thread(new SenderThread(se,processQueue, unDeliverablesQueue, executionQueue, LC, PT));
 		tomSenderThread.start();
 		tomReceiverThread = new Thread(new ReceiverThread(se,processQueue, unDeliverablesQueue, executionQueue, LC, PT));
-		tomSenderThread.start();
+		tomReceiverThread.start();
 		// Simplify for now with just a single receiver thread
 		//		service = Executors.newFixedThreadPool(Constants.THREAD_POOL_SIZE);
 		//		for (int i = 0; i < Constants.THREAD_POOL_SIZE; i++) {
