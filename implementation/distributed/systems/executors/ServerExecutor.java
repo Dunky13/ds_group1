@@ -91,7 +91,8 @@ public class ServerExecutor
 		
 		if (GameState.getAmIaLogger())logger.logText("Dragons connected, Initializing players...");
 		/* Initialize a random number of players (between [MIN_PLAYER_COUNT..MAX_PLAYER_COUNT] */
-		playerCount = (int)((MAX_PLAYER_COUNT - MIN_PLAYER_COUNT) * Math.random() + MIN_PLAYER_COUNT);
+		//playerCount = (int)((MAX_PLAYER_COUNT - MIN_PLAYER_COUNT) * Math.random() + MIN_PLAYER_COUNT);
+		playerCount = 2;
 		for(int i = 0; i < playerCount; i++)
 		{
 			/* Once again, pick a random spot */

@@ -366,6 +366,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		// Send the removeUnit message
 		//		clientSocket.sendMessage(removeMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(removeMessage);
+		System.out.println("Unit:removeUnit");
 		this.serverExecutor.sendMessageToOne(sp,removeMessage);
 	}
 
@@ -382,6 +383,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		// Send the getUnit message
 		//		clientSocket.sendMessage(moveMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(moveMessage);
+		System.out.println("Unit:moveUnit");
 		this.serverExecutor.sendMessageToOne(sp,moveMessage);
 		// Wait for the reply
 		while (!messageList.containsKey(id))
