@@ -27,17 +27,17 @@ with open ('WoWSession_Node_Player_Fixed_Dynamic.txt', newline='') as csvfile:
 alreadyAdded = list()
 relevantEvents = list()
 
-for row in trace:
+for index, row in enumerate(trace):
 
     if row[3].strip() == 'PLAYER_LOGIN':
 
         if row[1].strip()+row[3].strip() not in alreadyAdded:
             loginEvent = row
 
-            for r in trace:
+            for r in trace[index:]:
 
                 if r[3].strip() == 'PLAYER_LOGOUT' and r[1] == loginEvent[1]:
-                    relevantEvents.append([loginEvent[1].strip(), 0, loginEvent[3].strip()])
+                    relevantEvents.append([loginEvent[1].strip(), 0.0, loginEvent[3].strip()])
                     relevantEvents.append([r[1].strip(), (float(r[2].strip()) - float(loginEvent[2].strip())) / decreaseFactor, r[3].strip()])
                     alreadyAdded.append(loginEvent[1].strip()+loginEvent[3].strip())
 
@@ -55,4 +55,5 @@ with open('WoWSessionTraceSingleLoginLogout_simple.txt', 'w', newline='') as f:
     writer = csv.writer(f, delimiter=',')
     writer.writerow(['PlayerID', 'RelativeTime', 'Event'])
     writer.writerows(relevantEventsSorted)
+
 
