@@ -107,6 +107,7 @@ public class ServerSendReceive
   {
     try
     {
+      System.out.println("sendToAll");
       byte[] data = msg.serialize();
       for (Attachment attach : serverList)
       {
@@ -126,6 +127,7 @@ public class ServerSendReceive
   // Send a message to a specific server identified with a port
   public void sendToOne(ServerAndPorts sp, Message msg)
   {
+	  System.out.println("sendToOne");
     for (Attachment attach : serverList)
     {
       if (attach.id == sp.getPort())

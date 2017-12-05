@@ -91,6 +91,7 @@ public class Player extends Unit implements Runnable, Serializable
 		//Add the improved AI here
 		while (GameState.getRunningState() && this.running)
 		{
+			System.out.println("Looping" + this.getUnitID());
 			try
 			{
 				/* Sleep while the player is considering its next move */
