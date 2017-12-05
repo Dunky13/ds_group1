@@ -157,6 +157,7 @@ public class TomProcedure
 	public Message getExecutableMsgFromTOM()
 	{
 		if (GameState.getAmIaLogger())logger.logText("Attempting to retrieve executable msg from TOM");
+		System.out.println("Attempting to retrieve executable msg from TOM");
 		Message msg;
 		msg = executionQueue.remove(); //needs testing
 		if (GameState.getAmIaLogger())logger.logMessage(msg);

@@ -56,6 +56,7 @@ public class SenderThread implements Runnable
 			// spin on boolean value in proposedTimestamps or ad timeout value for fault-tolerance
 			while (!proposedTimestamps.receivedAllClocks) {
 			// wait for all clock values
+				System.out.println("Waiting on Clock val...");
 			}
 			int maxTimestamp = computeMax(proposedTimestamps.localClocks);// compute max and broadcast
 			proposedTimestamps.reset();
