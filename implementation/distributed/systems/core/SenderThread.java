@@ -113,13 +113,14 @@ public class SenderThread implements Runnable
 			}
 		}
 		//Remove from undeliverables
-		msg.put("LC",msg.get("maxLC")); //Replace LC with maxLC
+		msg.put("LC",msg.getInt("maxLC")); //Replace LC with maxLC
 		msg.removeMsgKeyVal("type");
 		msg.removeMsgKeyVal("maxLC");
 		msg.removeMsgKeyVal("serverID");
 		msg.removeMsgKeyVal("proposedLC");
 		msg.put("isDeliverable", 1);
 		executionQueue.add(msg); //Insert into execution Q
+		System.out.println("End of moveLocalMsgToExecutable");
 	}
 	
 	/** Return 

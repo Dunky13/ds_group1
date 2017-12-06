@@ -139,7 +139,7 @@ public class ReceiverThread implements Runnable
 				break;
 			}
 		}
-		msg.put("LC",msg.get("maxLC")); //Replace LC with maxLC
+		msg.put("LC",msg.getInt("maxLC")); //Replace LC with maxLC
 		msg.removeMsgKeyVal("type");
 		msg.removeMsgKeyVal("maxLC");
 		msg.removeMsgKeyVal("serverID");
