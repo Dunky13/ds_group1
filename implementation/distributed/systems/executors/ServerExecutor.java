@@ -106,6 +106,7 @@ public class ServerExecutor
 		/* Initialize a random number of players (between [MIN_PLAYER_COUNT..MAX_PLAYER_COUNT] */
 		//playerCount = (int)((MAX_PLAYER_COUNT - MIN_PLAYER_COUNT) * Math.random() + MIN_PLAYER_COUNT);
 		playerCount = 2;
+		int startingPort = se.getServerPortData().getReceivePort();
 		for(int i = 0; i < playerCount; i++)
 		{
 			/* Once again, pick a random spot */
@@ -126,7 +127,7 @@ public class ServerExecutor
 			 * thread, making sure it does not 
 			 * block the system.
 			 */
-			new ClientExecutor(new Player(finalX, finalY)).start();
+			new ClientExecutor(new Player(finalX, finalY), startingPort++).start();
 
 		}
 		while (!serversConnected){}

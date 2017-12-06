@@ -6,20 +6,20 @@ import java.net.SocketAddress;
 public class ServerAndPorts
 {
 	private String hostname;
-	private int tom_port;
-	private int receiver_port;
-	private int multicast_port;
-	private int publish_port;
+	private int port_three;
+	private int port_two;
+	private int port_one;
+	private int port_four;
 	private int id;
 
-	ServerAndPorts(int id, String hostname, int tom_port, int receiver_port, int multicast_port, int publish_port)
+	ServerAndPorts(int id, String hostname, int port_one, int port_two, int port_three, int port_four)
 	{
 		this.id = id;
 		this.hostname = hostname;
-		this.tom_port = tom_port;
-		this.receiver_port = receiver_port;
-		this.multicast_port = multicast_port;
-		this.publish_port = publish_port;
+		this.port_one = port_one;
+		this.port_two = port_two;
+		this.port_three = port_three;
+		this.port_four = port_four;
 
 	}
 
@@ -44,7 +44,7 @@ public class ServerAndPorts
 	 */
 	public int getTom_port()
 	{
-		return tom_port;
+		return port_three;
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class ServerAndPorts
 	 */
 	public int getReceiver_port()
 	{
-		return receiver_port;
+		return port_two;
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class ServerAndPorts
 	 */
 	public int getMulticast_port()
 	{
-		return multicast_port;
+		return port_one;
 	}
 
 	/**
@@ -68,31 +68,36 @@ public class ServerAndPorts
 	 */
 	public int getPublish_port()
 	{
-		return publish_port;
+		return port_four;
 	}
 
 	public int getServerToServerReceivePort()
 	{
-		return publish_port;
+		return port_four;
 	}
 
 	public int getPort()
 	{
-		return multicast_port;
+		return port_one;
 	}
 
 	public int getServerToClientPort()
 	{
-		return receiver_port;
+		return port_two;
 	}
 
 	public int getClientToServerPort()
 	{
-		return tom_port;
+		return port_three;
 	}
 
 	public SocketAddress getSocketAddress()
 	{
 		return new InetSocketAddress(this.getHostname(), this.getPort());
+	}
+
+	public int getReceivePort() {
+		
+		return port_two;
 	}
 }
