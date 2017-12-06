@@ -100,4 +100,8 @@ public class ServerAndPorts
 		
 		return port_two;
 	}
+	
+	public String toString() {
+		return "ID: " + this.id +" - Host: " + this.getHostname() + " - P1: " + this.port_one + " - P2: " + this.port_two;
+	}
 }

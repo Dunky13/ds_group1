@@ -83,6 +83,7 @@ public class SenderThread implements Runnable
 		if (GameState.getAmIaLogger())logger.logMessage(msg);
 		msg.put("isDeliverable", 0);
 		msg.put("LC", LC.getClockValue());
+		proposedTimestamps.setLocalClock(msg.getInt("serverID"), LC.getClockValue());
 		unDeliverablesQueue.add(msg);
 	}
 	
@@ -95,7 +96,7 @@ public class SenderThread implements Runnable
 		if (GameState.getAmIaLogger())logger.logMessage(msg);
 		//TO-DO: Multicast
 		se.sendMessageToMany(msg);
-		
+		System.out.println("se returned");
 	}	
 	
 	public synchronized void moveLocalMsgToExecutable(Message msg, Iterator it) {

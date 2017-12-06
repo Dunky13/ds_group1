@@ -25,4 +25,8 @@ public class Attachment {
 	public Attachment(ServerAndPorts sp) {
 		this.sp = sp;
 	}
+	
+	public String toString() {
+		return "Attachment ID: " + this.id + " SP: " + this.sp.toString();
+	}
 }

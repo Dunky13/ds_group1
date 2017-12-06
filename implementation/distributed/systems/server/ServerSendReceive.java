@@ -110,8 +110,10 @@ public class ServerSendReceive
 		{
 			System.out.println("sendToAll");
 			byte[] data = msg.serialize();
+			int x=0;
 			for (Attachment attach : serverList)
 			{
+				System.out.println("Iteration " + ++x );
 				attach.buffer = ByteBuffer.allocate(2048);
 				attach.isRead = false;
 				attach.buffer.put(data);
@@ -129,8 +131,11 @@ public class ServerSendReceive
 	public void sendToOne(ServerAndPorts sp, Message msg)
 	{
 		System.out.println("sendToOne");
+		System.out.println(serverList.size());
 		for (Attachment attach : serverList)
 		{
+			System.out.println(attach.toString() + " = compare to = " + sp.toString());
+			System.out.println("TEST DIMITRI");
 			if (attach.id == sp.getPort())
 			{
 				try
@@ -143,8 +148,9 @@ public class ServerSendReceive
 					ReadWriteHandlerClient readWriteHandler = new ReadWriteHandlerClient();
 					attach.channel.write(attach.buffer, attach, readWriteHandler);
 				}
-				catch (IOException e)
+				catch (Exception e)
 				{
+					e.printStackTrace();
 				}
 			}
 		}

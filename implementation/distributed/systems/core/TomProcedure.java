@@ -23,6 +23,8 @@ package distributed.systems.core;
 //Step 6: Mark the message as deliverable on each server, and pass it to the execution queue	
 
 import java.util.Comparator;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import distributed.systems.core.logger.Logger;
@@ -43,7 +45,7 @@ public class TomProcedure
 	private ProposedTimestamps PT;
 	private String localServerId;
 
-	//private ExecutorService service;
+	private ExecutorService service;
 	private Thread tomSenderThread;
 	private Thread tomReceiverThread;
 	public ServerExecutor se;
@@ -79,14 +81,13 @@ public class TomProcedure
 		System.out.println("TOM Initialized. Starting Threads");
 		tomSenderThread = new Thread(new SenderThread(se,processQueue, unDeliverablesQueue, executionQueue, LC, PT));
 		tomSenderThread.start();
-		tomReceiverThread = new Thread(new ReceiverThread(se,executionQueue, unDeliverablesQueue, srvMsgQueue, LC, PT));
-		tomReceiverThread.start();
-		// Simplify for now with just a single receiver thread
-		//		service = Executors.newFixedThreadPool(Constants.THREAD_POOL_SIZE);
-		//		for (int i = 0; i < Constants.THREAD_POOL_SIZE; i++) {
-		//			service.submit(new ReceiverThread(executionQueue, unDeliverablesQueue,srvMsgQueue,LC,PT));
-		//		}
-		
+		//tomReceiverThread = new Thread(new ReceiverThread(se,executionQueue, unDeliverablesQueue, srvMsgQueue, LC, PT));
+		//tomReceiverThread.start();
+		//Simplify for now with just a single receiver thread
+		service = Executors.newFixedThreadPool(Constants.THREAD_POOL_SIZE);
+		for (int i = 0; i < Constants.THREAD_POOL_SIZE; i++) {
+			service.submit(new ReceiverThread(se,executionQueue, unDeliverablesQueue,srvMsgQueue,LC,PT));
+		}	
 		
 	}
 
@@ -155,7 +156,7 @@ public class TomProcedure
 	 * @return msg
 	 */
 	// this can be done by a separate threads who continuously pulls the head of the execution queue
-	public Message getExecutableMsgFromTOM()
+	public synchronized Message getExecutableMsgFromTOM()
 	{
 		if (GameState.getAmIaLogger())logger.logText("Attempting to retrieve executable msg from TOM");
 		System.out.println("Attempting to retrieve executable msg from TOM");

@@ -92,6 +92,7 @@ public class ReceiverThread implements Runnable
 		//int outgoingServerId = Integer.parseInt( (String)msg.get("serverID"));
 		int outgoingServerId = msg.getInt("serverID");
 		ServerAndPorts sp = Constants.SERVER_PORT[outgoingServerId];
+		System.out.println("Destination srv ID " + Constants.SERVER_PORT[outgoingServerId].toString());
 		se.sendMessageToOne(sp, msg);		
 	}
 	
@@ -108,6 +109,7 @@ public class ReceiverThread implements Runnable
 		//int proposedLC = Integer.parseInt( (String) msg.get("proposedLC"));
 		int serverID = msg.getInt("serverID");
 		int proposedLC = msg.getInt("proposedLC");
+		System.out.println("procProposedLcMsg id: " + serverID + " in_LC:" +proposedLC);
 		proposedTimestamps.setLocalClock(serverID, proposedLC);
 	}
 	
