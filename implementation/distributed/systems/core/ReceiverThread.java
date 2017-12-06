@@ -46,7 +46,7 @@ public class ReceiverThread implements Runnable
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			switch((Integer) msg.get("type"))
+			switch(msg.getInt("type"))
 			{
 				case Constants.ORIGINAL_MSG:
 					procOriginatorMsg(msg);
@@ -89,7 +89,8 @@ public class ReceiverThread implements Runnable
 	public void sendLocalLcToOriginator(Message msg){
 		if (GameState.getAmIaLogger())logger.logText("sendLocalLcToOriginator called");
 		System.out.println("sendLocalLcToOriginator called");
-		int outgoingServerId = (Integer) msg.get("serverID");
+		//int outgoingServerId = Integer.parseInt( (String)msg.get("serverID"));
+		int outgoingServerId = msg.getInt("serverID");
 		ServerAndPorts sp = Constants.SERVER_PORT[outgoingServerId];
 		se.sendMessageToOne(sp, msg);		
 	}
@@ -103,8 +104,10 @@ public class ReceiverThread implements Runnable
 	public void procProposedLcMsg(Message msg) {
 		if (GameState.getAmIaLogger())logger.logText("procProposedLcMsg called");
 		System.out.println("procProposedLcMsg called");
-		int serverID = (Integer) msg.get("serverID");
-		int proposedLC = (Integer) msg.get("proposedLC");
+		//int serverID = Integer.parseInt( (String) msg.get("serverID"));
+		//int proposedLC = Integer.parseInt( (String) msg.get("proposedLC"));
+		int serverID = msg.getInt("serverID");
+		int proposedLC = msg.getInt("proposedLC");
 		proposedTimestamps.setLocalClock(serverID, proposedLC);
 	}
 	
@@ -121,11 +124,11 @@ public class ReceiverThread implements Runnable
 	public void procMaxLcMsg (Message msg, Iterator it) {
 		if (GameState.getAmIaLogger())logger.logText("procMaxLcMsg called");
 		System.out.println("procMaxLcMsg called");
-		int msgId = (Integer)msg.get("id");
-		int maxLC = (Integer)msg.get("MaxLC");
+		int msgId = msg.getInt("id");
+		int maxLC = msg.getInt("MaxLC");
 		for(Iterator i=it; it.hasNext();) {//untested
 			Message m = (Message) i.next();
-			if((Integer)m.get("id")==msgId) {
+			if(m.getInt("id")==msgId) {
 				it.remove(); //Remove from undeliverables
 				break;
 			}

@@ -1,5 +1,7 @@
 package distributed.systems.executors;
 
+import java.io.Serializable;
+
 import distributed.systems.core.ClientAndPort;
 import distributed.systems.core.Constants;
 import distributed.systems.core.Message;
@@ -213,6 +215,10 @@ public class ServerExecutor
 
 	public static void sendMessageToServer(ServerAndPorts sp, Message msg) {
 		ServerSendReceive.sendMoveToServer(sp.getPort(), msg);
+	}
+	
+	public static void sendMessageToServer(int port, Message msg) {
+		ServerSendReceive.sendMoveToServer(port, msg);
 	}
 
 	public void replyToClient(Message msg) {

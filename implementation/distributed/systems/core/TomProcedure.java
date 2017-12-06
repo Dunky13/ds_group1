@@ -173,7 +173,7 @@ public class TomProcedure
 	public boolean isMessageAvailable()
 	{
 		System.out.println("isMessageAvailable called");
-		if (!executionQueue.isEmpty() && ((Integer)executionQueue.peek().get("isDeliverable")) == 1)
+		if (!executionQueue.isEmpty() && (executionQueue.peek().getInt("isDeliverable")) == 1)
 		{
 			return true;
 		}
@@ -194,7 +194,7 @@ public class TomProcedure
 
 		public int compare(Message m1, Message m2)
 		{
-			return Integer.compare((Integer)m1.get("LC"), (Integer)m2.get("LC"));
+			return Integer.compare(m1.getInt("LC"), m2.getInt("LC"));
 		}
 	}
 

@@ -244,20 +244,23 @@ public class BattleField implements IMessageReceivedHandler
 			case getUnit:
 			{
 				reply = new Message();
-				int x = (Integer)msg.get("x");
-				int y = (Integer)msg.get("y");
+				int x = msg.getInt("x");
+				int y = msg.getInt("y");
+				Unit u = getUnit(x,y);
+				if(u == null) break;
 				reply.put("id", msg.get("id"));
-				reply.put("unit", getUnit(x, y));
-				reply.put("port",clientExecutor.getPort() );
+				reply.put("unit", u);
+				reply.put("port", u.getClientExecutor().getPort() );
 				//serverExecutor.se
 				//send message back here
+				serverExecutor.sendMessageToServer(msg.getInt("port"), reply);
 				break;
 			}
 			case getType:
 			{
 				reply = new Message();
-				int x = (Integer)msg.get("x");
-				int y = (Integer)msg.get("y");
+				int x = msg.getInt("x");
+				int y = msg.getInt("y");
 				reply.put("id", msg.get("id"));
 				reply.put("port", clientExecutor.getPort() );
 				if (getUnit(x, y) instanceof Player)
@@ -298,16 +301,16 @@ public class BattleField implements IMessageReceivedHandler
 			switch (request)
 			{
 			case spawnUnit:
-				this.spawnUnit((Unit)msg.get("unit"), (Integer)msg.get("x"), (Integer)msg.get("y"));
+				this.spawnUnit((Unit)msg.get("unit"), (Integer)msg.getInt("x"), (Integer)msg.getInt("y"));
 				break;
 			case putUnit:
-				this.putUnit((Unit)msg.get("unit"), (Integer)msg.get("x"), (Integer)msg.get("y"));
+				this.putUnit((Unit)msg.get("unit"), (Integer)msg.getInt("x"), (Integer)msg.getInt("y"));
 				break;
 			case getUnit:
 			{
 				reply = new Message();
-				int x = (Integer)msg.get("x");
-				int y = (Integer)msg.get("y");
+				int x = (Integer)msg.getInt("x");
+				int y = (Integer)msg.getInt("y");
 				/* Copy the id of the message so that the unit knows 
 				 * what message the battlefield responded to. 
 				 */
@@ -319,8 +322,8 @@ public class BattleField implements IMessageReceivedHandler
 			case getType:
 			{
 				reply = new Message();
-				int x = (Integer)msg.get("x");
-				int y = (Integer)msg.get("y");
+				int x = (Integer)msg.getInt("x");
+				int y = (Integer)msg.getInt("y");
 				/* Copy the id of the message so that the unit knows 
 				 * what message the battlefield responded to. 
 				 */
@@ -335,11 +338,11 @@ public class BattleField implements IMessageReceivedHandler
 			}
 			case dealDamage:
 			{
-				int x = (Integer)msg.get("x");
-				int y = (Integer)msg.get("y");
+				int x = (Integer)msg.getInt("x");
+				int y = (Integer)msg.getInt("y");
 				unit = this.getUnit(x, y);
 				if (unit != null)
-					unit.adjustHitPoints(-(Integer)msg.get("damage"));
+					unit.adjustHitPoints(-(Integer)msg.getInt("damage"));
 				/* Copy the id of the message so that the unit knows 
 				 * what message the battlefield responded to. 
 				 */
@@ -347,11 +350,11 @@ public class BattleField implements IMessageReceivedHandler
 			}
 			case healDamage:
 			{
-				int x = (Integer)msg.get("x");
-				int y = (Integer)msg.get("y");
+				int x = (Integer)msg.getInt("x");
+				int y = (Integer)msg.getInt("y");
 				unit = this.getUnit(x, y);
 				if (unit != null)
-					unit.adjustHitPoints((Integer)msg.get("healed"));
+					unit.adjustHitPoints((Integer)msg.getInt("healed"));
 				/* Copy the id of the message so that the unit knows 
 				 * what message the battlefield responded to. 
 				 */
@@ -359,14 +362,14 @@ public class BattleField implements IMessageReceivedHandler
 			}
 			case moveUnit:
 				//reply = new Message();
-				this.moveUnit((Unit)msg.get("unit"), (Integer)msg.get("x"), (Integer)msg.get("y"));
+				this.moveUnit((Unit)msg.get("unit"), (Integer)msg.getInt("x"), (Integer)msg.getInt("y"));
 				/* Copy the id of the message so that the unit knows 
 				 * what message the battlefield responded to. 
 				 */
 				//reply.put("id", msg.get("id"));
 				break;
 			case removeUnit:
-				this.removeUnit((Integer)msg.get("x"), (Integer)msg.get("y"));
+				this.removeUnit((Integer)msg.getInt("x"), (Integer)msg.getInt("y"));
 				return;
 			}
 

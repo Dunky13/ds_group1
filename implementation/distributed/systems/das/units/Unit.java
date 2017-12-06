@@ -103,6 +103,10 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 	public void setClientExecutor(ClientExecutor ce) {
 		this.clientExecutor = ce;
 	}
+	
+	public ClientExecutor getClientExecutor() {
+		return this.clientExecutor;
+	}
 
 	/**
 	 * Adjust the hitpoints to a certain level. Useful for healing or dying

@@ -97,11 +97,11 @@ public class SenderThread implements Runnable
 	public void moveLocalMsgToExecutable(Message msg, Iterator it) {
 		if (GameState.getAmIaLogger())logger.logText("moveLocalMsgToExecutable called");
 		System.out.println("moveLocalMsgToExecutable called");
-		int msgId = (Integer)msg.get("id");
-		int maxLC = (Integer)msg.get("MaxLC");
+		int msgId = msg.getInt("id");
+		int maxLC = msg.getInt("MaxLC");
 		for(Iterator i=it; it.hasNext();) {//untested
 			Message m = (Message) i.next();
-			if((Integer)m.get("id")==msgId) {
+			if(m.getInt("id")==msgId) {
 				it.remove();
 				break;
 			}

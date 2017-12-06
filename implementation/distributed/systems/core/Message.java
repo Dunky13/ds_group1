@@ -50,6 +50,11 @@ public class Message implements Serializable
 	{
 		return contents.get(key);
 	}
+	
+	public int getInt(String key) {
+		Serializable val = contents.get(key);
+		return Integer.parseInt((String) val.toString());
+	}
 
 	public String toString()
 	{

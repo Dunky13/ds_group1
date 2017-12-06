@@ -15,6 +15,15 @@ public class ClientExecutor extends Thread {
 
 	public ClientExecutor(ClientAndPort port) {
 		this.clientAndPort = port;
+		
+		final ClientExecutor that =this;
+		new Thread(new Runnable() {
+
+			public void run() {
+				that.listenToServer();
+			}
+			
+		}).start();
 	}
 	
 	public void init(Unit u) {
