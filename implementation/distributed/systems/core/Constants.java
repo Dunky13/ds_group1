@@ -26,4 +26,11 @@ public final class Constants{
 	public static final int ORIGINAL_MSG = 1;
 	public static final int PROPOSED_TIMESTAMP_MSG = 2;
 	public static final int FINAL_TIMESTAMP_MSG = 3;	
+	
+	
+	public static final int MIN_PLAYER_COUNT = 30;
+	public static final int MAX_PLAYER_COUNT = 60;
+	public static final int DRAGON_COUNT = 20;
+	public static final int TIME_BETWEEN_PLAYER_LOGIN = 5000; // In milliseconds
+
 }

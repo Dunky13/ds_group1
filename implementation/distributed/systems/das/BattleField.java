@@ -238,6 +238,7 @@ public class BattleField implements IMessageReceivedHandler
 	public void receivedClientMessage(Message msg)
 	{
 		System.out.println("receivedClientMessage");
+		LC.advanceClock();
 		MessageRequest request = (MessageRequest)msg.get("request");
 		Message reply;
 		switch (request) {

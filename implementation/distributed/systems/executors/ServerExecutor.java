@@ -75,6 +75,7 @@ public class ServerExecutor
 		//System.out.println(testpath);
 		//battlefield = BattleField.getBattleField();
 		//if (GameState.getAmIaLogger())logger.createLogFile();
+		while (!serversConnected){}
 		if (GameState.getAmIaLogger())logger.logText("Game started!");
 		System.out.println("Game started!");
 		/* All the dragons connect */
@@ -134,7 +135,7 @@ public class ServerExecutor
 			ce.init(new Player(ce, finalX, finalY));
 
 		}
-		while (!serversConnected){}
+		
 
 		System.out.println("All players initialized. Starting viewer...");
 		if (GameState.getAmIaLogger())logger.logText("All players initialized. Starting viewer...");
