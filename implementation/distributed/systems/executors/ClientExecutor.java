@@ -19,4 +19,8 @@ public class ClientExecutor extends Thread {
 		Message message = null;
 		unit.onMessageReceived(message);
 	}
+	
+	public int getPort() {
+		return this.port;
+	}
 }

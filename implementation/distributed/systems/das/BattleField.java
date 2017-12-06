@@ -45,6 +45,7 @@ public class BattleField implements IMessageReceivedHandler
 	private LinkedBlockingQueue<Message> srvMsgQueue;
 
 	private ServerExecutor serverExecutor;
+	private ClientExecutor clientExecutor;
 
 	/**
 	 * Initialize the battlefield to the specified size
@@ -246,6 +247,7 @@ public class BattleField implements IMessageReceivedHandler
 				int y = (Integer)msg.get("y");
 				reply.put("id", msg.get("id"));
 				reply.put("unit", getUnit(x, y));
+				reply.put(, );
 				//serverExecutor.se
 				//send message back here
 				break;
@@ -256,6 +258,7 @@ public class BattleField implements IMessageReceivedHandler
 				int x = (Integer)msg.get("x");
 				int y = (Integer)msg.get("y");
 				reply.put("id", msg.get("id"));
+				reply.put(, );
 				if (getUnit(x, y) instanceof Player)
 					reply.put("type", UnitType.player);
 				else if (getUnit(x, y) instanceof Dragon)
