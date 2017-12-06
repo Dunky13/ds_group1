@@ -214,6 +214,9 @@ public class ServerExecutor
 		ServerSendReceive.sendMoveToServer(port, msg);
 	}
 
+	public void replyToClient(Message msg) {
+		//serverSendReceive.
+	}
 
 
 	public void receiveMessage(Message msg)

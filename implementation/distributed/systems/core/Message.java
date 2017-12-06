@@ -83,11 +83,7 @@ public class Message implements Serializable
 		ObjectInput in = new ObjectInputStream(bis);
 		HashMap<String,Serializable> tmpMap = (HashMap) in.readObject();
 		Message msg = new Message();
-//		Set<E> set = tmpMap.entrySet();
-//		Iterator iter = set.iterator();
-//		while(iter.hasNext()) {
-//			msg.put( , );
-//		}
+
 		msg.setContent(tmpMap);
 		return msg;
 	}
