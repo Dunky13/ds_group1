@@ -1,19 +1,21 @@
 package distributed.systems.executors;
 
+import distributed.systems.core.ClientAndPort;
 import distributed.systems.core.Message;
+import distributed.systems.das.units.Player;
 import distributed.systems.das.units.Unit;
 
 
 public class ClientExecutor extends Thread {
 
 	private Unit unit;
-	private int port;
+	private ClientAndPort clientAndPort;
 
-	public ClientExecutor(Unit u, int port) {
+	public ClientExecutor(Unit u, ClientAndPort port) {
 		this.unit = u;
-		this.port = port;
+		this.clientAndPort = port;
 	}
-	
+
 	public void listenToServer() {
 		// When message is received
 		Message message = null;
@@ -21,6 +23,16 @@ public class ClientExecutor extends Thread {
 	}
 	
 	public int getPort() {
-		return this.port;
+		return this.clientAndPort.getPort();
 	}
+	
+	public ClientAndPort getClientPort() {
+		return this.clientAndPort;
+	}
+	
+	
+	public int getUnitId() {
+		return unit.getUnitID();
+	}
+	
 }
