@@ -10,6 +10,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
+
 import distributed.systems.das.units.Unit;
 
 public class Message implements Serializable
@@ -63,11 +65,15 @@ public class Message implements Serializable
 		contents.remove(key);
 	}
 
+	public void setContent(HashMap<String,Serializable> hMap) {
+		contents=hMap;		
+	}
+	
 	public byte[] serialize() throws IOException
 	{
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		ObjectOutput out = new ObjectOutputStream(bos);
-		out.writeObject(this);
+		out.writeObject(contents);
 		return bos.toByteArray();
 	}
 
@@ -75,6 +81,14 @@ public class Message implements Serializable
 	{
 		ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
 		ObjectInput in = new ObjectInputStream(bis);
-		return (Message)in.readObject();
+		HashMap<String,Serializable> tmpMap = (HashMap) in.readObject();
+		Message msg = new Message();
+//		Set<E> set = tmpMap.entrySet();
+//		Iterator iter = set.iterator();
+//		while(iter.hasNext()) {
+//			msg.put( , );
+//		}
+		msg.setContent(tmpMap);
+		return msg;
 	}
 }

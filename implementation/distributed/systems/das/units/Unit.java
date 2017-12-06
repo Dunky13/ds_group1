@@ -6,7 +6,6 @@ import java.util.Map;
 import distributed.systems.core.IMessageReceivedHandler;
 import distributed.systems.core.Message;
 import distributed.systems.core.ServerAndPorts;
-import distributed.systems.core.exception.AlreadyAssignedIDException;
 import distributed.systems.das.BattleField;
 import distributed.systems.das.GameState;
 import distributed.systems.das.MessageRequest;
@@ -55,8 +54,8 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 	 */
 	protected Thread runnerThread;
 
-	private ServerExecutor serverExecutor;
-	private ServerAndPorts sp;
+	private transient ServerExecutor serverExecutor;
+	private transient ServerAndPorts sp;
 	
 	/**
 	 * Create a new unit and specify the number of hitpoints. Units hitpoints

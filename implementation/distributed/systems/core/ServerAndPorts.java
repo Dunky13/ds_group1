@@ -5,7 +5,6 @@ import java.net.SocketAddress;
 
 public class ServerAndPorts
 {
-
 	private String hostname;
 	private int tom_port;
 	private int receiver_port;
