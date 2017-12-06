@@ -26,7 +26,7 @@ public class ProposedTimestamps {
 	 */
 	public void setLocalClock(int serverID, int LC) {
 		if (!receivedAllClocks) { // just an extra check
-			localClocks[serverID-1] = LC;
+			localClocks[serverID] = LC;
 			
 			boolean flip = true;
 			for (int i = 0; i < localClocks.length; i++) {
