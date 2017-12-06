@@ -8,7 +8,7 @@ public class ClientAndPort
 	private String hostname;
 	private int port_one;
 
-	ClientAndPort(String hostname, int port_one)
+	public ClientAndPort(String hostname, int port_one)
 	{
 		this.hostname = hostname;
 		this.port_one = port_one;

@@ -17,6 +17,9 @@ import distributed.systems.das.units.Unit;
 public class Message implements Serializable
 {
 
+	public enum ImportantMessageKeys {
+		id, port, x, y, request, LC
+	}
 	private static final long serialVersionUID = -2791452299144895125L;
 	HashMap<String, Serializable> contents;
 

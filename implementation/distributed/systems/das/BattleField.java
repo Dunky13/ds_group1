@@ -11,6 +11,7 @@ import distributed.systems.das.units.Player;
 import distributed.systems.das.units.Unit;
 import distributed.systems.das.units.extra.Bound;
 import distributed.systems.das.units.extra.UnitType;
+import distributed.systems.executors.ClientExecutor;
 import distributed.systems.executors.ServerExecutor;
 
 /**
@@ -247,7 +248,7 @@ public class BattleField implements IMessageReceivedHandler
 				int y = (Integer)msg.get("y");
 				reply.put("id", msg.get("id"));
 				reply.put("unit", getUnit(x, y));
-				reply.put(, );
+				reply.put("port",clientExecutor.getPort() );
 				//serverExecutor.se
 				//send message back here
 				break;
@@ -258,7 +259,7 @@ public class BattleField implements IMessageReceivedHandler
 				int x = (Integer)msg.get("x");
 				int y = (Integer)msg.get("y");
 				reply.put("id", msg.get("id"));
-				reply.put(, );
+				reply.put("port", clientExecutor.getPort() );
 				if (getUnit(x, y) instanceof Player)
 					reply.put("type", UnitType.player);
 				else if (getUnit(x, y) instanceof Dragon)

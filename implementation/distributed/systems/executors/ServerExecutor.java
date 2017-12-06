@@ -1,5 +1,6 @@
 package distributed.systems.executors;
 
+import distributed.systems.core.ClientAndPort;
 import distributed.systems.core.Constants;
 import distributed.systems.core.Message;
 import distributed.systems.core.ServerAndPorts;
@@ -127,7 +128,7 @@ public class ServerExecutor
 			 * thread, making sure it does not 
 			 * block the system.
 			 */
-			new ClientExecutor(new Player(finalX, finalY), startingPort++).start();
+			new ClientExecutor(new Player(finalX, finalY), new ClientAndPort(se.getServerPortData().getHostname(), ++startingPort)).start();
 
 		}
 		while (!serversConnected){}

@@ -11,6 +11,7 @@ import distributed.systems.das.GameState;
 import distributed.systems.das.MessageRequest;
 import distributed.systems.das.units.extra.Coordinate;
 import distributed.systems.das.units.extra.UnitType;
+import distributed.systems.executors.ClientExecutor;
 import distributed.systems.executors.ServerExecutor;
 
 /**
@@ -55,6 +56,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 	protected Thread runnerThread;
 
 	private transient ServerExecutor serverExecutor;
+	private transient ClientExecutor clientExecutor;
 	private transient ServerAndPorts sp;
 	
 	/**
@@ -97,6 +99,10 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 //
 //		clientSocket.addMessageReceiveHandler(this);
 	}
+	
+	public void setClientExecutor(ClientExecutor ce) {
+		this.clientExecutor = ce;
+	}
 
 	/**
 	 * Adjust the hitpoints to a certain level. Useful for healing or dying
@@ -136,6 +142,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 			damageMessage.put("y", y);
 			damageMessage.put("damage", damage);
 			damageMessage.put("id", id);
+			damageMessage.put("port",clientExecutor.getPort() );
 		}
 
 		// Send a spawn message
@@ -162,6 +169,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 			healMessage.put("y", y);
 			healMessage.put("healed", healed);
 			healMessage.put("id", id);
+			healMessage.put("port", clientExecutor.getPort());
 		}
 
 		// Send a spawn message
@@ -255,7 +263,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		spawnMessage.put("y", y);
 		spawnMessage.put("unit", this);
 		spawnMessage.put("id", id);
-
+		spawnMessage.put("port", clientExecutor.getPort());
 		//clientSocket.sendMessage(spawnMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(spawnMessage);
 		System.out.println("Unit:spawn");
@@ -285,7 +293,8 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		getMessage.put("x", x);
 		getMessage.put("y", y);
 		getMessage.put("id", id);
-
+		getMessage.put("port", clientExecutor.getPort());
+		
 		// Send the getUnit message
 		//		clientSocket.sendMessage(getMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(getMessage);
@@ -325,7 +334,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		getMessage.put("x", x);
 		getMessage.put("y", y);
 		getMessage.put("id", id);
-
+		getMessage.put("port", clientExecutor.getPort());
 		// Send the getUnit message
 		//		clientSocket.sendMessage(getMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(getMessage);
@@ -361,7 +370,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		removeMessage.put("x", x);
 		removeMessage.put("y", y);
 		removeMessage.put("id", id);
-
+		removeMessage.put("port", clientExecutor.getPort());
 		// Send the removeUnit message
 		//		clientSocket.sendMessage(removeMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(removeMessage);
@@ -378,7 +387,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		moveMessage.put("y", y);
 		moveMessage.put("id", id);
 		moveMessage.put("unit", this);
-
+		moveMessage.put("port", clientExecutor.getPort() );
 		// Send the getUnit message
 		//		clientSocket.sendMessage(moveMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(moveMessage);
