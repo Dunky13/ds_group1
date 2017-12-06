@@ -104,7 +104,7 @@ public class SenderThread implements Runnable
 		System.out.println("moveLocalMsgToExecutable called");
 		if (GameState.getAmIaLogger())logger.logMessage(msg);
 		int msgId = msg.getInt("id");
-		int maxLC = msg.getInt("MaxLC");
+		int maxLC = msg.getInt("maxLC");
 		for(Iterator i=it; it.hasNext();) {//untested
 			Message m = (Message) i.next();
 			if(m.getInt("id")==msgId) {
@@ -113,9 +113,9 @@ public class SenderThread implements Runnable
 			}
 		}
 		//Remove from undeliverables
-		msg.put("LC",msg.get("MaxLC")); //Replace LC with maxLC
+		msg.put("LC",msg.get("maxLC")); //Replace LC with maxLC
 		msg.removeMsgKeyVal("type");
-		msg.removeMsgKeyVal("MaxLC");
+		msg.removeMsgKeyVal("maxLC");
 		msg.removeMsgKeyVal("serverID");
 		msg.removeMsgKeyVal("proposedLC");
 		msg.put("isDeliverable", 1);

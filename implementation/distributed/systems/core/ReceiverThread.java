@@ -50,11 +50,14 @@ public class ReceiverThread implements Runnable
 			{
 				case Constants.ORIGINAL_MSG:
 					procOriginatorMsg(msg);
+					System.out.println("Received Originator msg");
 					break;
 				case Constants.PROPOSED_TIMESTAMP_MSG:
+					System.out.println("Received pts msg");
 					procProposedLcMsg(msg);
 					break;
 				case Constants.FINAL_TIMESTAMP_MSG:
+					System.out.println("Received final msg");
 					procMaxLcMsg(msg, delIt);
 					break;
 			}
@@ -91,6 +94,7 @@ public class ReceiverThread implements Runnable
 		System.out.println("sendLocalLcToOriginator called");
 		//int outgoingServerId = Integer.parseInt( (String)msg.get("serverID"));
 		int outgoingServerId = msg.getInt("serverID");
+		msg.put("serverID", se.getServerPortData().getID());
 		ServerAndPorts sp = Constants.SERVER_PORT[outgoingServerId];
 		System.out.println("Destination srv ID " + Constants.SERVER_PORT[outgoingServerId].toString());
 		se.sendMessageToOne(sp, msg);		
@@ -127,7 +131,7 @@ public class ReceiverThread implements Runnable
 		if (GameState.getAmIaLogger())logger.logText("procMaxLcMsg called");
 		System.out.println("procMaxLcMsg called");
 		int msgId = msg.getInt("id");
-		int maxLC = msg.getInt("MaxLC");
+		int maxLC = msg.getInt("maxLC");
 		for(Iterator i=it; it.hasNext();) {//untested
 			Message m = (Message) i.next();
 			if(m.getInt("id")==msgId) {
@@ -135,9 +139,9 @@ public class ReceiverThread implements Runnable
 				break;
 			}
 		}
-		msg.put("LC",msg.get("MaxLC")); //Replace LC with maxLC
+		msg.put("LC",msg.get("maxLC")); //Replace LC with maxLC
 		msg.removeMsgKeyVal("type");
-		msg.removeMsgKeyVal("MaxLC");
+		msg.removeMsgKeyVal("maxLC");
 		msg.removeMsgKeyVal("serverID");
 		msg.removeMsgKeyVal("proposedLC");
 		msg.put("isDeliverable", 1);

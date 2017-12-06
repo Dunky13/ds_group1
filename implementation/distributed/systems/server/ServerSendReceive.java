@@ -15,7 +15,7 @@ import distributed.systems.executors.ServerExecutor;
 
 public class ServerSendReceive
 {
-	private static ArrayList<Attachment> serverList = new ArrayList<Attachment>();
+	private static Attachment[] serverList = new Attachment[Constants.SERVER_PORT.length];
 	private static ArrayList<ServerAndPorts> aliveServers = new ArrayList<ServerAndPorts>();
 	private ServerExecutor serverExecutor;
 	private ServerAndPorts serverAndPorts;
@@ -32,7 +32,7 @@ public class ServerSendReceive
 		}).start();
 
 		//		new Thread(() -> {
-			//			this.askForInput();
+		//			this.askForInput();
 		//		}).start();
 
 		// spawining the actual server
@@ -70,9 +70,9 @@ public class ServerSendReceive
 						System.out.format("\u001B[35m" + "Accepted a  connection from  %s%n" + "\u001B[0m", clientAddr);
 						Attachment attach = new Attachment();
 						attach.channel = channel;
-						attach.id = sap.getPort();
+						attach.id = sap.getID();
 						System.out.println("The id: " + attach.id);
-						serverList.add(attach);
+						serverList[attach.id] = attach;
 						aliveServers.add(sap);
 						if (aliveServers.size() == (Constants.SERVER_PORT.length - 1))
 						{
@@ -113,6 +113,7 @@ public class ServerSendReceive
 			int x=0;
 			for (Attachment attach : serverList)
 			{
+				if(attach == null) continue;
 				System.out.println("Iteration " + ++x );
 				attach.buffer = ByteBuffer.allocate(2048);
 				attach.isRead = false;
@@ -125,34 +126,33 @@ public class ServerSendReceive
 		catch (IOException e)
 		{
 		}
+		finally {
+			System.out.println("sendToAll is done");
+		}
 	}
 
 	// Send a message to a specific server identified with a port
-	public void sendToOne(ServerAndPorts sp, Message msg)
+	public synchronized void sendToOne(ServerAndPorts sp, Message msg)
 	{
 		System.out.println("sendToOne");
-		System.out.println(serverList.size());
-		for (Attachment attach : serverList)
-		{
-			System.out.println(attach.toString() + " = compare to = " + sp.toString());
-			System.out.println("TEST DIMITRI");
-			if (attach.id == sp.getPort())
+		byte[] data;
+		try {
+			data = msg.serialize();
+			Attachment attach = serverList[sp.getID()];
+
+			if (attach.id == sp.getID())
 			{
-				try
-				{
-					byte[] data = msg.serialize();
-					attach.buffer = ByteBuffer.allocate(2048);
-					attach.isRead = false;
-					attach.buffer.put(data);
-					attach.buffer.flip();
-					ReadWriteHandlerClient readWriteHandler = new ReadWriteHandlerClient();
-					attach.channel.write(attach.buffer, attach, readWriteHandler);
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
+				attach.buffer = ByteBuffer.allocate(2048);
+				attach.isRead = false;
+				attach.buffer.put(data);
+				attach.buffer.flip();
+				ReadWriteHandlerClient readWriteHandler = new ReadWriteHandlerClient();
+				attach.channel.write(attach.buffer, attach, readWriteHandler);
 			}
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		} finally {
+			System.out.println("sendToOne is done");
 		}
 	}
 

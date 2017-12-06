@@ -69,6 +69,7 @@ public class BattleField implements IMessageReceivedHandler
 			units = new ArrayList<Unit>();
 			//add server is to new
 			LC = new ServerClock();
+			LC.advanceClock();
 			//			tom = new TomProcedure("1",LC);
 
 		}
