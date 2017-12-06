@@ -52,15 +52,15 @@ public class ServerExecutor
 		if (GameState.getAmIaLogger()) logger.createLogFile();
 
 		/* Spawn a new battlefield viewer */
-		if (srvId == 0) {
-			final ServerExecutor se = this;
-			new Thread(new Runnable() {
-				public void run() {
-					se.bfv = new BattleFieldViewer();
-					se.bfv.setBattleField(battlefield);
-				}
-			}).start();
-		}
+//		if (srvId == 0) {
+//			final ServerExecutor se = this;
+//			new Thread(new Runnable() {
+//				public void run() {
+//					se.bfv = new BattleFieldViewer();
+//					se.bfv.setBattleField(battlefield);
+//				}
+//			}).start();
+//		}
 	}
 
 	public static void main(String[] args)

@@ -150,7 +150,7 @@ public class ServerSendReceive
 		}
 	}
 
-	public static synchronized void sendMoveToServer(int port, Message msg){
+	public static void sendMoveToServer(int port, Message msg){
 		try {  
 			AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
 			SocketAddress serverAddr = new InetSocketAddress("localhost", port);

@@ -57,6 +57,7 @@ public class SenderThread implements Runnable
 			while (!proposedTimestamps.receivedAllClocks) {
 			// wait for all clock values
 				//System.out.println("Waiting on Clock val...");
+				
 			}
 			int maxTimestamp = computeMax(proposedTimestamps.localClocks);// compute max and broadcast
 			proposedTimestamps.reset();
@@ -76,7 +77,7 @@ public class SenderThread implements Runnable
 	 * Call after 'Multcasting' the Originator message
 	 * @param msg
 	 */
-	public void moveLocalMsgToUndeliverables(Message msg) {
+	public synchronized void moveLocalMsgToUndeliverables(Message msg) {
 		if (GameState.getAmIaLogger())logger.logText("moveLocalMsgToUndeliverables called");
 		System.out.println("moveLocalMsgToUndeliverables called");
 		if (GameState.getAmIaLogger())logger.logMessage(msg);
@@ -87,7 +88,7 @@ public class SenderThread implements Runnable
 	
 	
 	
-	private void sendMessageToOtherServers(Message msg, int type) {
+	private synchronized void sendMessageToOtherServers(Message msg, int type) {
 		if (GameState.getAmIaLogger())logger.logText("sendMessageToOtherServers called");
 		System.out.println("sendMessageToOtherServers called");
 		msg.put("type", type); //type 1 for originator messages.
@@ -97,7 +98,7 @@ public class SenderThread implements Runnable
 		
 	}	
 	
-	public void moveLocalMsgToExecutable(Message msg, Iterator it) {
+	public synchronized void moveLocalMsgToExecutable(Message msg, Iterator it) {
 		if (GameState.getAmIaLogger())logger.logText("moveLocalMsgToExecutable called");
 		System.out.println("moveLocalMsgToExecutable called");
 		if (GameState.getAmIaLogger())logger.logMessage(msg);
@@ -129,7 +130,7 @@ public class SenderThread implements Runnable
 	 * @param tss
 	 * @return
 	 */
-	public int computeMax(int...tss) {
+	public synchronized int computeMax(int...tss) {
 		System.out.println("Compute Max called!");
 		int result=0;
 		

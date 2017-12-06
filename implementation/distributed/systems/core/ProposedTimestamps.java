@@ -13,7 +13,7 @@ public class ProposedTimestamps {
 		initLocalClocks();
 	}
 	
-	private void initLocalClocks() {
+	private synchronized void initLocalClocks() {
 		for (int i = 0; i < localClocks.length; i++) {
 			localClocks[i] = 0;
 		}
@@ -24,7 +24,8 @@ public class ProposedTimestamps {
 	 * @param serverID, value between 1-5
 	 * @param LC
 	 */
-	public void setLocalClock(int serverID, int LC) {
+	public synchronized void setLocalClock(int serverID, int LC) {
+		System.out.println("Received LC: " + LC + " from server: " + serverID);
 		if (!receivedAllClocks) { // just an extra check
 			localClocks[serverID] = LC;
 			
@@ -42,7 +43,7 @@ public class ProposedTimestamps {
 		}
 	}
 	
-	public void reset() {
+	public synchronized void reset() {
 		receivedAllClocks = false;
 		initLocalClocks();
 	}

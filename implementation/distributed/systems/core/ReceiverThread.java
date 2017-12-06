@@ -68,7 +68,7 @@ public class ReceiverThread implements Runnable
 	 * This method is the one that receives and processes that message.
 	 * @param msg
 	 */
-	public void procOriginatorMsg(Message msg) {
+	public synchronized void procOriginatorMsg(Message msg) {
 		if (GameState.getAmIaLogger())logger.logText("procOriginatorMsg called");
 		System.out.println("procOriginatorMsg called");
 		//int origLc = (Integer)msg.get("LC"); //get originators clock
@@ -86,7 +86,7 @@ public class ReceiverThread implements Runnable
 	 * Called by procOriginatorMsg()
 	 * @param msg
 	 */
-	public void sendLocalLcToOriginator(Message msg){
+	public synchronized void sendLocalLcToOriginator(Message msg){
 		if (GameState.getAmIaLogger())logger.logText("sendLocalLcToOriginator called");
 		System.out.println("sendLocalLcToOriginator called");
 		//int outgoingServerId = Integer.parseInt( (String)msg.get("serverID"));
@@ -101,7 +101,7 @@ public class ReceiverThread implements Runnable
 	 * Process the proposed timestamps that everyone sent (used by originator)..
 	 * @param msg
 	 */
-	public void procProposedLcMsg(Message msg) {
+	public synchronized void procProposedLcMsg(Message msg) {
 		if (GameState.getAmIaLogger())logger.logText("procProposedLcMsg called");
 		System.out.println("procProposedLcMsg called");
 		//int serverID = Integer.parseInt( (String) msg.get("serverID"));
@@ -121,7 +121,7 @@ public class ReceiverThread implements Runnable
 	 * @param it
 	 */
 	@SuppressWarnings("rawtypes")
-	public void procMaxLcMsg (Message msg, Iterator it) {
+	public synchronized void procMaxLcMsg (Message msg, Iterator it) {
 		if (GameState.getAmIaLogger())logger.logText("procMaxLcMsg called");
 		System.out.println("procMaxLcMsg called");
 		int msgId = msg.getInt("id");
