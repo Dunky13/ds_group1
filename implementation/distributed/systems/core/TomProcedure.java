@@ -79,13 +79,14 @@ public class TomProcedure
 		System.out.println("TOM Initialized. Starting Threads");
 		tomSenderThread = new Thread(new SenderThread(se,processQueue, unDeliverablesQueue, executionQueue, LC, PT));
 		tomSenderThread.start();
-		tomReceiverThread = new Thread(new ReceiverThread(se,processQueue, unDeliverablesQueue, executionQueue, LC, PT));
+		tomReceiverThread = new Thread(new ReceiverThread(se,executionQueue, unDeliverablesQueue, srvMsgQueue, LC, PT));
 		tomReceiverThread.start();
 		// Simplify for now with just a single receiver thread
 		//		service = Executors.newFixedThreadPool(Constants.THREAD_POOL_SIZE);
 		//		for (int i = 0; i < Constants.THREAD_POOL_SIZE; i++) {
 		//			service.submit(new ReceiverThread(executionQueue, unDeliverablesQueue,srvMsgQueue,LC,PT));
 		//		}
+		
 		
 	}
 

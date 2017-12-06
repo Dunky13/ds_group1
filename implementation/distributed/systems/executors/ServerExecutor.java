@@ -27,6 +27,8 @@ public class ServerExecutor
 	//private BattleField b;
 	private static volatile boolean serversConnected = false;
 
+	private BattleFieldViewer bfv;
+
 	ServerExecutor(int serverID)
 	{
 		sp = Constants.SERVER_PORT[serverID];
@@ -45,6 +47,17 @@ public class ServerExecutor
 		}
 		if (GameState.getAmIaLogger()) logger = new Logger(serverID);
 		if (GameState.getAmIaLogger()) logger.createLogFile();
+		
+		/* Spawn a new battlefield viewer */
+		if (srvId == 0) {
+			final ServerExecutor se = this;
+			new Thread(new Runnable() {
+				public void run() {
+					se.bfv = new BattleFieldViewer();
+					se.bfv.setBattleField(battlefield);
+				}
+			}).start();
+		}
 	}
 
 	public static void main(String[] args)
@@ -55,7 +68,7 @@ public class ServerExecutor
 			System.out.println("missing serverID argument");
 			System.exit(1);
 		}
-		ServerExecutor se = new ServerExecutor(Integer.parseInt(args[0]));
+		final ServerExecutor se = new ServerExecutor(Integer.parseInt(args[0]));
 		//System.out.println(testpath);
 		//battlefield = BattleField.getBattleField();
 		//if (GameState.getAmIaLogger())logger.createLogFile();
@@ -73,7 +86,7 @@ public class ServerExecutor
 
 			// If we didn't find an empty spot, we won't add a new dragon
 			if (battlefield.getUnit(x, y) != null) break;
-			
+
 			final int finalX = x;
 			final int finalY = y;
 
@@ -88,7 +101,7 @@ public class ServerExecutor
 			}).start();
 
 		}
-		
+
 		if (GameState.getAmIaLogger())logger.logText("Dragons connected, Initializing players...");
 		/* Initialize a random number of players (between [MIN_PLAYER_COUNT..MAX_PLAYER_COUNT] */
 		//playerCount = (int)((MAX_PLAYER_COUNT - MIN_PLAYER_COUNT) * Math.random() + MIN_PLAYER_COUNT);
@@ -118,20 +131,13 @@ public class ServerExecutor
 					new Player(finalX, finalY);
 				}
 			}).start();
-			
+
 		}
 		while (!serversConnected){}
-		
+
 		System.out.println("All players initialized. Starting viewer...");
 		if (GameState.getAmIaLogger())logger.logText("All players initialized. Starting viewer...");
-		/* Spawn a new battlefield viewer */
-		if (srvId == 0) {
-		new Thread(new Runnable() {
-			public void run() {
-				new BattleFieldViewer();
-			}
-		}).start();
-		}
+		
 		/* Add a random player every (5 seconds x GAME_SPEED) so long as the
 		 * maximum number of players to enter the battlefield has not been exceeded. 
 		 */
@@ -171,7 +177,7 @@ public class ServerExecutor
 							new Player(finalX, finalY);
 						}
 					}).start();
-					*/
+					 */
 					playerCount++;
 					System.out.println("playercount is: "+ playerCount);
 				}
@@ -179,7 +185,7 @@ public class ServerExecutor
 				e.printStackTrace();
 			}
 		}
-		
+
 		/* Make sure both the battlefield and
 		 * the socketmonitor close down.
 		 */
@@ -187,11 +193,11 @@ public class ServerExecutor
 		System.exit(0); // Stop all running processes
 	}
 
-		
+
 	public void serversConnected() {
 		this.serversConnected = true;
 	}
-	
+
 
 	public void sendMessageToMany(Message msg)
 	{
@@ -203,13 +209,13 @@ public class ServerExecutor
 		serverSendReceive.sendToOne(sp, msg);
 	}
 
-	
+
 	public static void sendMessageToServer(int port,Message msg) {
 		ServerSendReceive.sendMoveToServer(port, msg);
 	}
-	
-	
-	
+
+
+
 	public void receiveMessage(Message msg)
 	{
 		battlefield.receivedClientMessage(msg);

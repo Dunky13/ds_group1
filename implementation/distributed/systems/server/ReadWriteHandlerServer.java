@@ -47,7 +47,7 @@ class ReadWriteHandlerServer implements CompletionHandler<Integer, Attachment>
 			{
 				
 				msg = Message.deserialze(bytes);
-				System.out.println("Deserialized message");
+				//System.out.println("Deserialized message");
 				if (msg.containsKey("serverID"))
 				{
 					// call server executor function to handle server messages

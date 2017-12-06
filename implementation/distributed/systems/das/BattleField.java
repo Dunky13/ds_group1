@@ -42,7 +42,7 @@ public class BattleField implements IMessageReceivedHandler
 	private ArrayList<Unit> units;
 	TomProcedure tom;
 	ServerClock LC;
-	public LinkedBlockingQueue<Message> srvMsgQueue;
+	private LinkedBlockingQueue<Message> srvMsgQueue;
 
 	private ServerExecutor serverExecutor;
 
@@ -76,6 +76,7 @@ public class BattleField implements IMessageReceivedHandler
 	{
 		System.out.println("init method of battlefield called!");
 		this.serverExecutor = se;
+		srvMsgQueue = new LinkedBlockingQueue<Message>();
 		this.tom = new TomProcedure(se, LC, srvMsgQueue);
 
 	}
@@ -245,6 +246,7 @@ public class BattleField implements IMessageReceivedHandler
 				int y = (Integer)msg.get("y");
 				reply.put("id", msg.get("id"));
 				reply.put("unit", getUnit(x, y));
+				//serverExecutor.se
 				//send message back here
 				break;
 			}
@@ -261,7 +263,7 @@ public class BattleField implements IMessageReceivedHandler
 				else
 					reply.put("type", UnitType.undefined);
 				
-				
+				//serverExecutor
 				//send message back here
 				break;
 			}

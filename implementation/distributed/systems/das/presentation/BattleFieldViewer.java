@@ -33,6 +33,8 @@ public class BattleFieldViewer extends JPanel implements Runnable {
 	/* Dimension of the stored image */
 	private int bufferWidth;
 	private int bufferHeight;
+	
+	BattleField bf;
 
 	/* The thread that is used to make the battlefield run in a separate thread.
 	 * We need to remember this thread to make sure that Java exits cleanly.
@@ -46,6 +48,7 @@ public class BattleFieldViewer extends JPanel implements Runnable {
 	 */
 	public BattleFieldViewer() {
 		doubleBufferGraphics = null;
+		bf = BattleField.getBattleField();
 		runnerThread = new Thread(this);
 		runnerThread.start();
 	}
@@ -59,6 +62,10 @@ public class BattleFieldViewer extends JPanel implements Runnable {
 		doubleBufferImage = createImage(getWidth(), getHeight());
 		doubleBufferGraphics = doubleBufferImage.getGraphics();
 	}
+	
+	public void setBattleField(BattleField bf) {
+		this.bf = bf;
+	}
 
 	/**
 	 * Paint the battlefield overview. Use a red color
@@ -70,7 +77,7 @@ public class BattleFieldViewer extends JPanel implements Runnable {
 		double xRatio = (double)this.getWidth() / (double)BattleField.MAP_WIDTH;
 		double yRatio = (double)this.getHeight() / (double)BattleField.MAP_HEIGHT;
 		double filler;
-		BattleField bf = BattleField.getBattleField();
+//		BattleField bf = BattleField.getBattleField();
 
 		/* Possibly adjust the double buffer */
 		if(bufferWidth != getSize().width 

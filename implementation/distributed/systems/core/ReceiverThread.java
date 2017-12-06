@@ -40,6 +40,7 @@ public class ReceiverThread implements Runnable
 	public void run()
 	{	
 		while(GameState.getRunningState()) {
+			System.out.println("Receiver Looping");
 			try {
 				msg = receivedMsgQueue.take();
 			} catch (InterruptedException e) {
