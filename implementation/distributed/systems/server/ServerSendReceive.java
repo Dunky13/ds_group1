@@ -150,7 +150,7 @@ public class ServerSendReceive
     }
   }
 
-  public static void sendMoveToServer(int port, Message msg){
+  public static synchronized void sendMoveToServer(int port, Message msg){
 	try {  
     AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
     SocketAddress serverAddr = new InetSocketAddress("localhost", port);
@@ -160,6 +160,7 @@ public class ServerSendReceive
     Attachment attach = new Attachment();
     attach.channel = channel;
     byte[] data = msg.serialize();
+    System.out.println("After serialization");
     attach.buffer = ByteBuffer.allocate(2048);
     attach.isRead = false;
     attach.buffer.put(data);
@@ -167,7 +168,10 @@ public class ServerSendReceive
     ReadWriteHandlerClient readWriteHandler = new ReadWriteHandlerClient();
     attach.channel.write(attach.buffer, attach, readWriteHandler);
 	}catch (Exception e) {
+		System.out.println("DIMITRIS");
+		System.out.println(e.getMessage());
     	e.printStackTrace();
+    	//System.out.println(e.getCause());
     }
   }
 }
