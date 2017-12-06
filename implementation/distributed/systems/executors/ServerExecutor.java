@@ -76,6 +76,7 @@ public class ServerExecutor
 		if (GameState.getAmIaLogger())logger.logText("Game started!");
 		System.out.println("Game started!");
 		/* All the dragons connect */
+		int startingPort = se.getServerPortData().getReceivePort();
 		for(int i = 0; i < DRAGON_COUNT; i++) {
 			/* Try picking a random spot */
 			int x, y, attempt = 0;
@@ -95,11 +96,9 @@ public class ServerExecutor
 			 * thread, making sure it does not 
 			 * block the system.
 			 */
-			new Thread(new Runnable() {
-				public void run() {
-					new Dragon(finalX, finalY);
-				}
-			}).start();
+			ClientExecutor ce = new ClientExecutor(new ClientAndPort(se.getServerPortData().getHostname(), ++startingPort));
+			ce.start();
+			ce.init(new Dragon(ce, finalX, finalY));
 
 		}
 
@@ -107,7 +106,7 @@ public class ServerExecutor
 		/* Initialize a random number of players (between [MIN_PLAYER_COUNT..MAX_PLAYER_COUNT] */
 		//playerCount = (int)((MAX_PLAYER_COUNT - MIN_PLAYER_COUNT) * Math.random() + MIN_PLAYER_COUNT);
 		playerCount = 2;
-		int startingPort = se.getServerPortData().getReceivePort();
+//		int startingPort = se.getServerPortData().getReceivePort();
 		for(int i = 0; i < playerCount; i++)
 		{
 			/* Once again, pick a random spot */
@@ -128,7 +127,9 @@ public class ServerExecutor
 			 * thread, making sure it does not 
 			 * block the system.
 			 */
-			new ClientExecutor(new Player(finalX, finalY), new ClientAndPort(se.getServerPortData().getHostname(), ++startingPort)).start();
+			ClientExecutor ce = new ClientExecutor(new ClientAndPort(se.getServerPortData().getHostname(), ++startingPort));
+			ce.start();
+			ce.init(new Player(ce, finalX, finalY));
 
 		}
 		while (!serversConnected){}
@@ -165,7 +166,9 @@ public class ServerExecutor
 
 				if (battlefield.getUnit(x, y) == null) {
 					System.out.println("New player created!");
-					new Player(finalX, finalY);
+					ClientExecutor ce = new ClientExecutor(new ClientAndPort(se.getServerPortData().getHostname(), ++startingPort));
+					ce.start();
+					ce.init(new Player(ce, finalX, finalY));
 					/* Create the new player in a separate
 					 * thread, making sure it does not 
 					 * block the system.

@@ -7,9 +7,8 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 
 import distributed.systems.executors.ClientExecutor;
-import distributed.systems.executors.ServerExecutor;
 
-class ConnectionHandlerClient implements CompletionHandler<AsynchronousSocketChannel, Attachment>
+public class ConnectionHandlerClient implements CompletionHandler<AsynchronousSocketChannel, Attachment>
 {
 	private ClientExecutor clientExecutor;
 

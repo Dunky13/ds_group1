@@ -7,6 +7,7 @@ import distributed.systems.das.units.extra.Coordinate;
 import distributed.systems.das.units.extra.Direction;
 import distributed.systems.das.units.extra.RelativeBound;
 import distributed.systems.das.units.extra.UnitType;
+import distributed.systems.executors.ClientExecutor;
 import distributed.systems.executors.ServerExecutor;
 
 /**
@@ -52,7 +53,7 @@ public class Player extends Unit implements Runnable, Serializable
 	 * Create a player, initialize both the hit and the attackpoints.
 	 */
 	//include url and ports
-	public Player(int x, int y)
+	public Player(ClientExecutor ce, int x, int y)
 	{
 		/* Initialize the hitpoints and attackpoints */
 		//se.SendMessageToServer(port, msg);
@@ -63,6 +64,7 @@ public class Player extends Unit implements Runnable, Serializable
 		/* Create a random delay */
 		timeBetweenTurns = (int)(Math.random() * (MAX_TIME_BETWEEN_TURNS - MIN_TIME_BETWEEN_TURNS)) + MIN_TIME_BETWEEN_TURNS;
 		System.out.println("Player constructor called");
+		this.setClientExecutor(ce);
 		if (!spawn(x, y))
 			return; // We could not spawn on the battlefield
 		

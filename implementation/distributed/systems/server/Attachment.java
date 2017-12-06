@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import java.net.SocketAddress;
 
 public class Attachment {
-	AsynchronousServerSocketChannel server;
+	public AsynchronousServerSocketChannel server;
 	Thread mainThread;
 	public AsynchronousSocketChannel channel;
 	ByteBuffer buffer;
