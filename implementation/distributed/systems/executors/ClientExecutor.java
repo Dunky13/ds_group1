@@ -1,10 +1,20 @@
 package distributed.systems.executors;
 
-public class ClientExecutor {
+import distributed.systems.core.Message;
+import distributed.systems.das.units.Unit;
 
-//	public static void main(String[] args) {
-//		// TODO Auto-generated method stub
-//
-//	}
 
+public class ClientExecutor extends Thread {
+
+	private Unit unit;
+
+	public ClientExecutor(Unit u) {
+		this.unit = u;
+	}
+	
+	public void listenToServer() {
+		// When message is received
+		Message message = null;
+		unit.onMessageReceived(message);
+	}
 }

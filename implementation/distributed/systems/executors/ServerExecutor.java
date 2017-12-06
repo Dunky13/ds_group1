@@ -47,7 +47,7 @@ public class ServerExecutor
 		}
 		if (GameState.getAmIaLogger()) logger = new Logger(serverID);
 		if (GameState.getAmIaLogger()) logger.createLogFile();
-		
+
 		/* Spawn a new battlefield viewer */
 		if (srvId == 0) {
 			final ServerExecutor se = this;
@@ -126,18 +126,14 @@ public class ServerExecutor
 			 * thread, making sure it does not 
 			 * block the system.
 			 */
-			new Thread(new Runnable() {
-				public void run() {
-					new Player(finalX, finalY);
-				}
-			}).start();
+			new ClientExecutor(new Player(finalX, finalY)).start();
 
 		}
 		while (!serversConnected){}
 
 		System.out.println("All players initialized. Starting viewer...");
 		if (GameState.getAmIaLogger())logger.logText("All players initialized. Starting viewer...");
-		
+
 		/* Add a random player every (5 seconds x GAME_SPEED) so long as the
 		 * maximum number of players to enter the battlefield has not been exceeded. 
 		 */
@@ -210,8 +206,8 @@ public class ServerExecutor
 	}
 
 
-	public static void sendMessageToServer(int port,Message msg) {
-		ServerSendReceive.sendMoveToServer(port, msg);
+	public static void sendMessageToServer(ServerAndPorts sp, Message msg) {
+		ServerSendReceive.sendMoveToServer(sp.getPort(), msg);
 	}
 
 	public void replyToClient(Message msg) {

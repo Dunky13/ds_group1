@@ -142,7 +142,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		//		clientSocket.sendMessage(damageMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(damageMessage);
 		System.out.println("Unit:dealDamage");
-		ServerExecutor.sendMessageToServer(sp.getPort(),damageMessage);
+		ServerExecutor.sendMessageToServer(sp,damageMessage);
 	}
 
 	public void healDamage(int x, int y, int healed)
@@ -167,7 +167,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		// Send a spawn message
 		//		clientSocket.sendMessage(healMessage, "localsocket://" + BattleField.serverID);
 		System.out.println("Unit:healDamage");
-		ServerExecutor.sendMessageToServer(sp.getPort(),healMessage);
+		ServerExecutor.sendMessageToServer(sp,healMessage);
 		//this.serverExecutor.sendMessageToMany(healMessage); This is wrong
 	}
 
@@ -259,7 +259,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		//clientSocket.sendMessage(spawnMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(spawnMessage);
 		System.out.println("Unit:spawn");
-		ServerExecutor.sendMessageToServer(sp.getPort(),spawnMessage);
+		ServerExecutor.sendMessageToServer(sp,spawnMessage);
 		// Wait for the unit to be placed
 		getUnit(x, y);
 
@@ -290,7 +290,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		//		clientSocket.sendMessage(getMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(getMessage);
 		System.out.println("Unit:getType");
-		ServerExecutor.sendMessageToServer(sp.getPort(),getMessage);
+		ServerExecutor.sendMessageToServer(sp,getMessage);
 
 		// Wait for the reply
 		while (!messageList.containsKey(id))
@@ -330,7 +330,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		//		clientSocket.sendMessage(getMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(getMessage);
 		System.out.println("Unit:getUnit");
-		ServerExecutor.sendMessageToServer(sp.getPort(),getMessage);
+		ServerExecutor.sendMessageToServer(sp,getMessage);
 		// Wait for the reply
 		while (!messageList.containsKey(id))
 		{
@@ -366,7 +366,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		//		clientSocket.sendMessage(removeMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(removeMessage);
 		System.out.println("Unit:removeUnit");
-		ServerExecutor.sendMessageToServer(sp.getPort(),removeMessage);
+		ServerExecutor.sendMessageToServer(sp,removeMessage);
 	}
 
 	protected void moveUnit(int x, int y)
@@ -383,7 +383,7 @@ public abstract class Unit implements Serializable, IMessageReceivedHandler
 		//		clientSocket.sendMessage(moveMessage, "localsocket://" + BattleField.serverID);
 		//this.serverExecutor.sendMessageToMany(moveMessage);
 		System.out.println("Unit:moveUnit");
-		ServerExecutor.sendMessageToServer(sp.getPort(),moveMessage);
+		ServerExecutor.sendMessageToServer(sp, moveMessage);
 		// Wait for the reply
 		while (!messageList.containsKey(id))
 		{
