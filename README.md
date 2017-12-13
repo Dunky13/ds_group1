@@ -1,7 +1,7 @@
 # The Dragons Arena System:
 ## Distributed Simulation of Virtual Worlds
 
-This repository contains the implementation for the DAS assignment for the VU course Distributed Systems.
+This repository contains the implementation for the DAS assignment for the VU course Distributed Systems by group1/team1300.
 
 To build the system, run `ant build` in the implementation directory. The runserver.sh script provides a wrapper of the command to run a server. For the current version, server IDs are hardcoded. A server instance should be run by `./runserver.sh [0-4]`.
 
