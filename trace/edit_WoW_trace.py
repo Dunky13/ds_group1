@@ -12,7 +12,7 @@ from operator import itemgetter
 
 '''
 
-decreaseFactor = 50
+decreaseFactor = 10
 
 with open ('WoWSession_Node_Player_Fixed_Dynamic.txt', newline='') as csvfile:
     traceReader = csv.reader(csvfile, delimiter=',')
