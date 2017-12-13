@@ -145,7 +145,7 @@ public class Player extends Unit implements Runnable, Serializable
 				e.printStackTrace();
 			}
 		}
-		System.err.println("Player died");
+		System.err.println("Player " + this.getUnitID() + " died");
 	}
 
 	private ClosestPlayerDragon findClosest(final int MAX_DIST, RelativeBound rb)

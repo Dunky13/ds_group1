@@ -253,7 +253,7 @@ public abstract class Unit
 
 	public void print(String... ss)
 	{
-		System.out.print("Unit " + this.getUnitID() + ": ");
+		System.out.print(this.unitType.toString() + " (" + this.getUnitID() + "): ");
 		for (String s : ss)
 		{
 			System.out.print(s);
