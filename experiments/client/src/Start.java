@@ -14,8 +14,8 @@ public class Start
 
 	public void start()
 	{
-		Player p1 = new Player(9, 7);
-		Dragon d1 = new Dragon(9, 9);
+		Player p1 = new Player(7, 3);
+		Dragon d1 = new Dragon(1, 5);
 		Player p2 = new Player(9, 8);
 
 		startDragon(d1);
