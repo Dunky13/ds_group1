@@ -1,5 +1,5 @@
-#The Dragons Arena System:#
-##Distributed Simulation of Virtual Worlds##
+# The Dragons Arena System:
+## Distributed Simulation of Virtual Worlds
 
 This repository contains the implementation for the DAS assignment for the VU course Distributed Systems.
 
