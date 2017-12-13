@@ -222,11 +222,10 @@ public class BattleField
 
 	public void dealDamage(Coordinate c, int damage)
 	{
-		System.out.println("Deal damage to unit on: " + c.toString() + "with points: " + -damage);
 		Unit u = this.getUnit(c.getX(), c.getY());
 		if (u == null)
 		{
-			System.out.println("Unit no longer available");
+			System.out.println("Unit no longer available on " + c.toString());
 			return;
 		}
 		u.adjustHitPoints(-damage);
@@ -234,11 +233,10 @@ public class BattleField
 
 	public void healDamage(Coordinate c, int healPoints)
 	{
-		System.out.println("Heal unit on: " + c.toString() + "with points: " + healPoints);
 		Unit u = this.getUnit(c.getX(), c.getY());
 		if (u == null)
 		{
-			System.out.println("Unit no longer available");
+			System.out.println("Unit no longer available on " + c.toString());
 			return;
 		}
 		u.adjustHitPoints(healPoints);
@@ -246,13 +244,11 @@ public class BattleField
 
 	public void moveUnit(Unit u, Coordinate c)
 	{
-		System.out.println("Move unit from: " + u.getPosition().toString() + " to: " + c.toString());
 		this.moveUnit(u, c.getX(), c.getY());
 	}
 
 	public void removeUnit(Unit u)
 	{
-		System.out.println("Removing unit on: " + u.getPosition().toString());
 		this.removeUnit(u.getX(), u.getY());
 	}
 

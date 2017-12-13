@@ -75,7 +75,7 @@ public class Player extends Unit implements Runnable, Serializable
 		unitType = UnitType.player;
 		/* Create a random delay */
 		timeBetweenTurns = (int)(Math.random() * (MAX_TIME_BETWEEN_TURNS - MIN_TIME_BETWEEN_TURNS)) + MIN_TIME_BETWEEN_TURNS;
-		System.out.println("Player constructor called");
+		print("Player constructor called");
 		if (!spawn())
 			return; // We could not spawn on the battlefield
 
@@ -83,7 +83,7 @@ public class Player extends Unit implements Runnable, Serializable
 		//new Thread(this).start();
 		runnerThread = new Thread(this);
 		runnerThread.start();
-		System.out.println("runnerThread returned");
+		print("runnerThread returned");
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class Player extends Unit implements Runnable, Serializable
 				ClosestPlayerDragon cpd = this.findClosest(Player.MAX_HEAL_RANGE * 2, rb);
 				if (cpd.dragon != null)
 				{
-					System.out.println(this.getUnitID() + ": Distance to dragon: " + this.getPosition().distanceTo(cpd.dragon));
+					print("Distance to dragon: " + this.getPosition().distanceTo(cpd.dragon));
 				}
 				if (cpd.player != null)
 				{

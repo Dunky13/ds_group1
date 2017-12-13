@@ -92,13 +92,15 @@ public abstract class Unit
 	public void dealDamage(int x, int y, int damage)
 	{
 		Coordinate c = new Coordinate(x, y);
-		System.out.println("Dealing " + damage + " to Unit on: " + c.toString());
+		print("Dealing " + damage + " to Unit on: " + c.toString());
 		this.battleField.dealDamage(c, damage);
 	}
 
 	public void healDamage(int x, int y, int healed)
 	{
-		this.battleField.healDamage(new Coordinate(x, y), healed);
+		Coordinate c = new Coordinate(x, y);
+		print("Healing " + healed + "to Unit on: " + c.toString());
+		this.battleField.healDamage(c, healed);
 	}
 
 	/**
@@ -209,13 +211,16 @@ public abstract class Unit
 
 	protected void removeUnit()
 	{
+		print("Removing unit on: " + this.getPosition().toString());
 		this.battleField.removeUnit(this);
 		this.disconnect();
 	}
 
 	protected void moveUnit(int x, int y)
 	{
-		this.battleField.moveUnit(this, new Coordinate(x, y));
+		Coordinate c = new Coordinate(x, y);
+		print("Move unit from: " + this.getPosition().toString() + " to: " + c.toString());
+		this.battleField.moveUnit(this, c);
 	}
 
 	// Disconnects the unit from the battlefield by exiting its run-state
@@ -248,11 +253,11 @@ public abstract class Unit
 
 	public void print(String... ss)
 	{
-		if (this.getUnitID() != 1)
-			return;
+		System.out.print("Unit " + this.getUnitID() + ": ");
 		for (String s : ss)
 		{
-			System.out.println(s);
+			System.out.print(s);
 		}
+		System.out.println();
 	}
 }
